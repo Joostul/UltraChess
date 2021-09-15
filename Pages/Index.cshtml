@@ -1,0 +1,25 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+<div class="grid-container">
+    @{
+        for (int rank = 0; rank < 8; rank++)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                bool isLightSquare = (file + rank) % 2 != 0;
+                if(isLightSquare)
+                {                    
+                    <div class="grid-item light"></div>
+                } else
+                {     
+                    <div class="grid-item dark"></div>
+                }
+            }
+        }
+    }
+</div>
