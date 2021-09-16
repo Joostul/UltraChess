@@ -17,24 +17,18 @@
             {
                 bool isLightSquare = (file + rank) % 2 != 0;
                 var id = string.Format("{0}.{1}", characters[file-1], numbers[rank-1]);
-                string idString = "";
+                string rankString = "";
+                string fileString = "";
                 if(file==1){
-                    idString = numbers[rank-1].ToString();
+                    rankString = numbers[rank-1].ToString();
                 }
                 if((rank/8)==1){
-                    idString = characters[file-1].ToString();
+                    fileString += characters[file-1].ToString();
                 }
-                if(isLightSquare)
-                {                    
-                    <div id="@id" class="grid-item light">
-                        <div>@(idString)</div>
-                    </div>
-                } else
-                {     
-                    <div id="@id" class="grid-item dark">
-                        <div>@(idString)</div>
-                    </div>
-                }
+                <div class="grid-item @(@isLightSquare ? "light" : "dark")">
+                    <div class="rank-text">@rankString</div>
+                    <div class="file-text">@fileString</div>
+                </div>
             }
         }
     }

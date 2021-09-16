@@ -102,3 +102,8 @@ body {
 .dark {
   background-color: darkseagreen;
 }
+
+.file-text {
+  text-align: right;
+  vertical-align: bottom;
+}
