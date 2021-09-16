@@ -82,19 +82,16 @@ body {
 .chess-board .light { background: #eee; }
 .chess-board .dark { background: #aaa; }
 
-.rank {}
-.file { width: 1.5em; height: 1.5em; text-align: center; font-size: 32px; line-height: 0; border: 1px solid black;}
 
 .grid-container {
   display: grid;
-  grid-template-columns: auto auto auto auto auto auto auto auto;
-  padding: 10px;
+  grid-template-columns: repeat(8, auto);
 }
+
 .grid-item {
   border: 1px solid rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  font-size: 30px;
-  text-align: center;
+  width: 100%; 
+  height: 100%; 
   aspect-ratio: 1;
 }
 

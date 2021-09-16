@@ -4,20 +4,36 @@
     ViewData["Title"] = "Home page";
 }
 
+@{
+    char[] characters = "abcdefgh".ToCharArray();
+    char[] numbers = "87654321".ToCharArray();
+}
 
 <div class="grid-container">
     @{
-        for (int rank = 0; rank < 8; rank++)
+        for (int rank = 1; rank < 9; rank++)
         {
-            for (int file = 0; file < 8; file++)
+            for (int file = 1; file < 9; file++)
             {
                 bool isLightSquare = (file + rank) % 2 != 0;
+                var id = string.Format("{0}.{1}", characters[file-1], numbers[rank-1]);
+                string idString = "";
+                if(file==1){
+                    idString = numbers[rank-1].ToString();
+                }
+                if((rank/8)==1){
+                    idString = characters[file-1].ToString();
+                }
                 if(isLightSquare)
                 {                    
-                    <div class="grid-item light"></div>
+                    <div id="@id" class="grid-item light">
+                        <div>@(idString)</div>
+                    </div>
                 } else
                 {     
-                    <div class="grid-item dark"></div>
+                    <div id="@id" class="grid-item dark">
+                        <div>@(idString)</div>
+                    </div>
                 }
             }
         }
