@@ -1,0 +1,121 @@
+﻿@page "/chess"
+
+<h3>Chess</h3>
+
+<div class="grid-container">
+    @{
+        foreach (var square in chessBoard.squares)
+        {
+            <div id="@($"{square.File}.{square.Rank}")" class="grid-item fill @(square.IsLight ? "light" : "dark")" ondragover="event.preventDefault();" @ondrop="@(()=> Drop(square))" >
+
+                <div class="rank-text">@(square.File == 'a' ? square.Rank.ToString() : "")</div>
+                <div class="file-text">@(square.Rank == '1' ? square.File.ToString() : "")</div>
+                @{
+                    if (square.Piece != null)
+                    {
+                        <img id="@($"{square.File}.{square.Rank}-image")" src="@(square.Piece.Image)" @ondrag="@(()=> StartDrag(square))" ondrop="event.preventDefault();" />
+                    }
+                }
+            </div>
+        }
+    }
+</div>
+
+
+@code {
+
+    private ChessBoard chessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    Square FromSquare;
+
+
+    void StartDrag(Square fromSquare)
+    {
+        FromSquare = fromSquare;
+    }
+
+    void Drop(Square toSquare)
+    {
+        toSquare.Piece = FromSquare.Piece;
+        chessBoard.squares.Single(s => s.File == FromSquare.File && s.Rank == FromSquare.Rank).Piece = null;
+        StateHasChanged();
+    }
+
+    public class ChessBoard
+    {
+        string _FEN;
+        char[] characters = "abcdefgh".ToCharArray();
+        char[] numbers = "87654321".ToCharArray();
+        Dictionary<char, string> images = new Dictionary<char, string>
+        {
+            { 'r', "img/R_B.png" },
+            { 'n', "img/N_B.png" },
+            { 'b', "img/B_B.png" },
+            { 'q', "img/Q_B.png" },
+            { 'k', "img/K_B.png" },
+            { 'p', "img/P_B.png" },
+            { 'R', "img/R_W.png" },
+            { 'N', "img/N_W.png" },
+            { 'B', "img/B_W.png" },
+            { 'Q', "img/Q_W.png" },
+            { 'K', "img/K_W.png" },
+            { 'P', "img/P_W.png" }
+        };
+        public List<Square> squares = new List<Square>();
+
+        public ChessBoard(string FEN)
+        {
+            _FEN = FEN;
+            string[] FENpieces = FEN.Split(' ');
+            string[] FENranks = FENpieces[0].Split('/');
+            int skip = 0;
+            for (int rank = 1; rank < 9; rank++)
+            {
+                for (int file = 1; file < 9; file++)
+                {
+                    var piece = new Piece();
+                    var square = new Square
+                    {
+                        File = characters[file - 1],
+                        Rank = numbers[rank - 1],
+                        IsLight = (file + rank) % 2 != 0
+                    };
+                    if (skip == 0)
+                    {
+                        var fenCharacter = FENranks[rank - 1][file - 1];
+                        if (char.IsDigit(fenCharacter))
+                        {
+                            skip = int.Parse(fenCharacter.ToString()) - 1;
+                        }
+                        else
+                        {
+                            piece.Fen = fenCharacter;
+                            piece.Image = images[fenCharacter];
+                        }
+                    }
+                    else
+                    {
+                        skip--;
+                    }
+
+                    square.Piece = skip != 0 ? null : piece;
+
+                    squares.Add(square);
+                }
+            }
+        }
+    }
+
+    public class Square
+    {
+        public char File { get; set; }
+        public char Rank { get; set; }
+        public bool IsLight { get; set; }
+        public Piece Piece { get; set; }
+    }
+
+    public class Piece
+    {
+        public char Fen { get; set; }
+        public string Image { get; set; }
+    }
+}
