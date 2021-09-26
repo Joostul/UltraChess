@@ -27,13 +27,15 @@
     private ChessBoard ChessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     private int FromSquareId;
     private List<int> LegalSquaresToMoveTo;
+    private List<int> LegalSquaresToCapture;
 
     void StartDrag(int fromSquareId)
     {
         FromSquareId = fromSquareId;
         if(ChessBoard.squares[fromSquareId].Piece is Pawn pawn)
         {
-            LegalSquaresToMoveTo = pawn.GetSquaresToMoveTo(ChessBoard.squares[fromSquareId].Id);
+            LegalSquaresToMoveTo = pawn.GetSquaresToMoveTo(fromSquareId);
+            LegalSquaresToCapture = pawn.GetSquaresToCapture(fromSquareId);
             foreach (var legalSquareToMoveTo in LegalSquaresToMoveTo)
             {
                 ChessBoard.squares[legalSquareToMoveTo].IsHighlighted = true;
@@ -56,9 +58,20 @@
         }
         if (LegalSquaresToMoveTo.Contains(toSquareId))
         {
-            ChessBoard.squares[toSquareId].Piece = ChessBoard.squares[FromSquareId].Piece;
-            ChessBoard.squares[FromSquareId].Piece = null;
+            if (ChessBoard.squares[toSquareId].Piece == null)
+            {
+                ChessBoard.squares[toSquareId].Piece = ChessBoard.squares[FromSquareId].Piece;
+                ChessBoard.squares[FromSquareId].Piece = null;
+            }
             StateHasChanged();
+        }
+        if (LegalSquaresToCapture.Contains(toSquareId))
+        {
+            if (ChessBoard.squares[toSquareId].Piece != null && ChessBoard.squares[toSquareId].Piece.IsWhite != ChessBoard.squares[FromSquareId].Piece.IsWhite)
+            {
+                ChessBoard.squares[toSquareId].Piece = ChessBoard.squares[FromSquareId].Piece;
+                ChessBoard.squares[FromSquareId].Piece = null;
+            }
         }
     }
 }

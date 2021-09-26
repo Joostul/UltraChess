@@ -26,5 +26,22 @@ namespace UltraChess.Blazor.Models
 
             return squaresToMoveTo;
         }
+
+        public List<int> GetSquaresToCapture(int fromSquare)
+        {
+            List<int> squaresToCapture = new();
+            if (IsWhite)
+            {
+                squaresToCapture.Add(fromSquare - 7);
+                squaresToCapture.Add(fromSquare - 9);
+            }
+            else
+            {
+                squaresToCapture.Add(fromSquare + 7);
+                squaresToCapture.Add(fromSquare + 9);
+            }
+
+            return squaresToCapture;
+        }
     }
 }
