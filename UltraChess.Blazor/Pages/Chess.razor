@@ -1,0 +1,74 @@
+﻿@page "/chess"
+@using UltraChess.Blazor.Models
+
+<h3>Chess</h3>
+
+<div class="grid-container">
+    @{
+        foreach (var square in ChessBoard.squares)
+        {
+            <div id="@($"{square.Id}")" class="grid-item fill @(square.IsHighlighted ? "highlight" : square.IsLight ? "light" : "dark")" ondragover="event.preventDefault();" @ondrop="@(()=> Drop(square.Id))" >
+
+                <div class="rank-text">@(square.File == 'a' ? square.Rank.ToString() : "")</div>
+                <div class="file-text">@(square.Rank == '1' ? square.File.ToString() : "")</div>
+                @{
+                    if (square.Piece != null)
+                    {
+                        <img id="@($"{square.File}.{square.Rank}-image")" src="@(square.Piece.Image)" @ondrag="@(()=> StartDrag(square.Id))" ondrop="event.preventDefault();" />
+                    }
+                }
+            </div>
+        }
+    }
+</div>
+
+
+@code {
+    private ChessBoard ChessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    private int FromSquareId;
+
+    void StartDrag(int fromSquareId)
+    {
+        FromSquareId = fromSquareId;
+        if (ChessBoard.IsWhiteTurn)
+        {
+            if(ChessBoard.squares[FromSquareId].Piece.IsWhite == true)
+            {
+                ChessBoard.HighlightLegalMoves(fromSquareId);
+            }
+        }
+        else
+        {
+            if (ChessBoard.squares[FromSquareId].Piece.IsWhite == false)
+            {
+                ChessBoard.HighlightLegalMoves(fromSquareId);
+            }
+        }
+    }
+
+    void Drop(int toSquareId)
+    {
+        if (ChessBoard.squares[FromSquareId].Piece.IsWhite)
+        {
+            if (ChessBoard.IsWhiteTurn)
+            {
+                var moveMade = ChessBoard.Move(FromSquareId, toSquareId);
+                if (moveMade)
+                {
+                    ChessBoard.IsWhiteTurn = false;
+                }
+            }
+        }
+        else
+        {
+            if (!ChessBoard.IsWhiteTurn)
+            {
+                var moveMade = ChessBoard.Move(FromSquareId, toSquareId);
+                if (moveMade)
+                {
+                    ChessBoard.IsWhiteTurn = true;
+                }
+            }
+        }
+    }
+}

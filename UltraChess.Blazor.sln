@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltraChess.Blazor", "UltraChess.Blazor.csproj", "{D0869762-C90B-4925-9C59-51974F7C5982}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltraChess.UnitTests", "UltraChess.UnitTests\UltraChess.UnitTests.csproj", "{30BBA308-19B0-42CC-B373-94D07BF68E06}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltraChess.Blazor", "UltraChess.Blazor\UltraChess.Blazor.csproj", "{A8852D0A-C53B-4689-BE5D-C9EE92A42F9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D0869762-C90B-4925-9C59-51974F7C5982}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0869762-C90B-4925-9C59-51974F7C5982}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D0869762-C90B-4925-9C59-51974F7C5982}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D0869762-C90B-4925-9C59-51974F7C5982}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30BBA308-19B0-42CC-B373-94D07BF68E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30BBA308-19B0-42CC-B373-94D07BF68E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30BBA308-19B0-42CC-B373-94D07BF68E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30BBA308-19B0-42CC-B373-94D07BF68E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8852D0A-C53B-4689-BE5D-C9EE92A42F9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8852D0A-C53B-4689-BE5D-C9EE92A42F9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8852D0A-C53B-4689-BE5D-C9EE92A42F9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8852D0A-C53B-4689-BE5D-C9EE92A42F9C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
