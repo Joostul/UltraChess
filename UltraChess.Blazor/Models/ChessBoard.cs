@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace UltraChess.Blazor.Models
 {
@@ -7,10 +8,10 @@ namespace UltraChess.Blazor.Models
         readonly char[] characters = "abcdefgh".ToCharArray();
         readonly char[] numbers = "87654321".ToCharArray();
         public Square[] squares = new Square[64];
-        public Piece[] pieces = new Piece[13] 
-        { 
-            null, 
-            new Pawn { IsWhite = true, Image = "img/P_W.png" }, 
+        public Piece[] pieces = new Piece[13]
+        {
+            null,
+            new Pawn { IsWhite = true, Image = "img/P_W.png" },
             new Knight { IsWhite = true, Image = "img/N_W.png" },
             new Bishop { IsWhite = true, Image = "img/B_W.png" },
             new Rook { IsWhite = true, Image = "img/R_W.png" },
@@ -54,10 +55,12 @@ namespace UltraChess.Blazor.Models
                             if (fenCharacter == 'P')
                             {
                                 square.PieceId = 1;
-                            } else if (fenCharacter == 'N')
+                            }
+                            else if (fenCharacter == 'N')
                             {
                                 square.PieceId = 2;
-                            } else if (fenCharacter == 'B')
+                            }
+                            else if (fenCharacter == 'B')
                             {
                                 square.PieceId = 3;
                             }
@@ -114,9 +117,9 @@ namespace UltraChess.Blazor.Models
             // TODO: Add pawn promotions
             var fromPiece = pieces[squares[fromSquareId].PieceId];
             var toPiece = pieces[squares[toSquareId].PieceId];
-            var legalSquaresToMoveTo = fromPiece.GetSquaresToMoveTo(fromSquareId);
-            var legalSquaresToCapture = fromPiece.GetSquaresToCapture(fromSquareId);
-            if(legalSquaresToCapture.Count < 1 && legalSquaresToMoveTo.Count < 1)
+            var legalSquaresToMoveTo = GetValidSquares(fromPiece.GetSquaresToMoveTo(fromSquareId));
+            var legalSquaresToCapture = GetValidSquares(fromPiece.GetSquaresToCapture(fromSquareId));
+            if (legalSquaresToCapture.Count < 1 && legalSquaresToMoveTo.Count < 1)
             {
                 return false;
             }
@@ -152,14 +155,16 @@ namespace UltraChess.Blazor.Models
 
         public void HighlightLegalMoves(int fromSquareId)
         {
-            if (pieces[squares[fromSquareId].PieceId] is Pawn pawn)
+            var legalSquaresToMoveTo = pieces[squares[fromSquareId].PieceId].GetSquaresToMoveTo(fromSquareId);
+            foreach (var legalSquareToMoveTo in legalSquaresToMoveTo)
             {
-                var legalSquaresToMoveTo = pawn.GetSquaresToMoveTo(fromSquareId);
-                foreach (var legalSquareToMoveTo in legalSquaresToMoveTo)
-                {
-                    squares[legalSquareToMoveTo].IsHighlighted = true;
-                }
+                squares[legalSquareToMoveTo].IsHighlighted = true;
             }
+        }
+
+        private List<int> GetValidSquares(List<int> squares)
+        {
+            return squares.Where(s => s < 64 && s > 0).ToList();
         }
     }
 }

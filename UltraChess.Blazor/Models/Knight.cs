@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace UltraChess.Blazor.Models
 {
@@ -14,7 +12,22 @@ namespace UltraChess.Blazor.Models
 
         public override List<int> GetSquaresToMoveTo(int fromSquare)
         {
-            throw new NotImplementedException();
+            List<int> squaresToMoveTo = new()
+            {
+                // Forward
+                fromSquare - 7,
+                fromSquare - 8,
+                fromSquare - 9,
+                // Sideways
+                fromSquare - 1,
+                fromSquare + 1,
+                // Backwards
+                fromSquare + 7,
+                fromSquare + 8,
+                fromSquare + 9
+            };
+
+            return squaresToMoveTo;
         }
     }
 }

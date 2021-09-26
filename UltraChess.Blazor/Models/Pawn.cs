@@ -24,8 +24,7 @@ namespace UltraChess.Blazor.Models
                     squaresToMoveTo.Add(fromSquare + 16);
                 }
             }
-            var validSquaresToMoveTo = squaresToMoveTo.Where(s => s < 64 && s > 0).ToList();
-            return validSquaresToMoveTo;
+            return squaresToMoveTo;
         }
 
         public override List<int> GetSquaresToCapture(int fromSquare)
@@ -41,8 +40,7 @@ namespace UltraChess.Blazor.Models
                 squaresToCapture.Add(fromSquare + 7);
                 squaresToCapture.Add(fromSquare + 9);
             }
-            var validSquaresToCapture = squaresToCapture.Where(s => s < 64 && s > 0).ToList();
-            return validSquaresToCapture;
+            return squaresToCapture;
         }
     }
 }

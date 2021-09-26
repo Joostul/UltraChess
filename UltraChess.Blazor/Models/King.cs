@@ -28,8 +28,7 @@ namespace UltraChess.Blazor.Models
                 fromSquare + 9
             };
 
-            var validSquaresToMoveTo = squaresToMoveTo.Where(s => s < 64 && s > 0).ToList();
-            return validSquaresToMoveTo;
+            return squaresToMoveTo;
         }
     }
 }
