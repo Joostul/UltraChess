@@ -6,23 +6,23 @@ namespace UltraChess.Blazor.Models
     {
         readonly char[] characters = "abcdefgh".ToCharArray();
         readonly char[] numbers = "87654321".ToCharArray();
-        readonly Dictionary<char, string> images = new()
-        {
-            { 'r', "img/R_B.png" },
-            { 'n', "img/N_B.png" },
-            { 'b', "img/B_B.png" },
-            { 'q', "img/Q_B.png" },
-            { 'k', "img/K_B.png" },
-            { 'p', "img/P_B.png" },
-            { 'R', "img/R_W.png" },
-            { 'N', "img/N_W.png" },
-            { 'B', "img/B_W.png" },
-            { 'Q', "img/Q_W.png" },
-            { 'K', "img/K_W.png" },
-            { 'P', "img/P_W.png" }
-        };
         public Square[] squares = new Square[64];
-        public Piece[] pieces = new Piece[16];
+        public Piece[] pieces = new Piece[13] 
+        { 
+            null, 
+            new Pawn { IsWhite = true, Image = "img/P_W.png" }, 
+            new Knight { IsWhite = true, Image = "img/N_W.png" },
+            new Bishop { IsWhite = true, Image = "img/B_W.png" },
+            new Rook { IsWhite = true, Image = "img/R_W.png" },
+            new Queen { IsWhite = true, Image = "img/Q_W.png" },
+            new King { IsWhite = true, Image = "img/K_W.png" },
+            new Pawn { IsWhite = false, Image = "img/P_B.png" },
+            new Knight { IsWhite = false, Image = "img/N_B.png" },
+            new Rook { IsWhite = false, Image = "img/R_B.png" },
+            new Bishop { IsWhite = false, Image = "img/B_B.png" },
+            new Queen { IsWhite = false, Image = "img/Q_B.png" },
+            new King { IsWhite = false, Image = "img/K_B.png" },
+        };
         public bool IsWhiteTurn;
 
         public ChessBoard(string FEN)
@@ -35,7 +35,6 @@ namespace UltraChess.Blazor.Models
             {
                 for (int file = 0; file < 8; file++)
                 {
-                    Piece piece = null;
                     var square = new Square
                     {
                         Id = rank * 8 + file,
@@ -52,44 +51,58 @@ namespace UltraChess.Blazor.Models
                         }
                         else
                         {
-                            var lowerChar = char.ToLower(fenCharacter);
-                            if (lowerChar == 'p')
+                            if (fenCharacter == 'P')
                             {
-                                piece = new Pawn();
-                            } else if (lowerChar == 'n')
+                                square.PieceId = 1;
+                            } else if (fenCharacter == 'N')
                             {
-                                piece = new Knight();
-                            } else if (lowerChar == 'b')
+                                square.PieceId = 2;
+                            } else if (fenCharacter == 'B')
                             {
-                                piece = new Bishop();
+                                square.PieceId = 3;
                             }
-                            else if (lowerChar == 'r')
+                            else if (fenCharacter == 'R')
                             {
-                                piece = new Rook();
+                                square.PieceId = 4;
                             }
-                            else if (lowerChar == 'k')
+                            else if (fenCharacter == 'Q')
                             {
-                                piece = new King();
+                                square.PieceId = 5;
                             }
-                            else if (lowerChar == 'q')
+                            else if (fenCharacter == 'K')
                             {
-                                piece = new Queen();
+                                square.PieceId = 6;
                             }
-                            else
+                            if (fenCharacter == 'p')
                             {
-                                throw new System.Exception();
+                                square.PieceId = 7;
                             }
-                            piece.Fen = fenCharacter;
-                            piece.Image = images[fenCharacter];
-                            piece.IsWhite = char.IsUpper(fenCharacter);
+                            else if (fenCharacter == 'n')
+                            {
+                                square.PieceId = 8;
+                            }
+                            else if (fenCharacter == 'b')
+                            {
+                                square.PieceId = 9;
+                            }
+                            else if (fenCharacter == 'r')
+                            {
+                                square.PieceId = 10;
+                            }
+                            else if (fenCharacter == 'q')
+                            {
+                                square.PieceId = 11;
+                            }
+                            else if (fenCharacter == 'k')
+                            {
+                                square.PieceId = 12;
+                            }
                         }
                     }
                     else
                     {
                         skip--;
                     }
-
-                    square.Piece = piece;
 
                     squares[square.Id] = square;
                 }
@@ -99,8 +112,10 @@ namespace UltraChess.Blazor.Models
         public bool Move(int fromSquareId, int toSquareId)
         {
             // TODO: Add pawn promotions
-            var legalSquaresToMoveTo = squares[fromSquareId].Piece.GetSquaresToMoveTo(fromSquareId);
-            var legalSquaresToCapture = squares[fromSquareId].Piece.GetSquaresToCapture(fromSquareId);
+            var fromPiece = pieces[squares[fromSquareId].PieceId];
+            var toPiece = pieces[squares[toSquareId].PieceId];
+            var legalSquaresToMoveTo = fromPiece.GetSquaresToMoveTo(fromSquareId);
+            var legalSquaresToCapture = fromPiece.GetSquaresToCapture(fromSquareId);
             if(legalSquaresToCapture.Count < 1 && legalSquaresToMoveTo.Count < 1)
             {
                 return false;
@@ -116,19 +131,19 @@ namespace UltraChess.Blazor.Models
             }
             if (legalSquaresToMoveTo.Contains(toSquareId))
             {
-                if (squares[toSquareId].Piece == null)
+                if (squares[toSquareId].PieceId == 0)
                 {
-                    squares[toSquareId].Piece = squares[fromSquareId].Piece;
-                    squares[fromSquareId].Piece = null;
+                    squares[toSquareId].PieceId = squares[fromSquareId].PieceId;
+                    squares[fromSquareId].PieceId = 0;
                     return true;
                 }
             }
             if (legalSquaresToCapture.Contains(toSquareId))
             {
-                if (squares[toSquareId].Piece != null && squares[toSquareId].Piece.IsWhite != squares[fromSquareId].Piece.IsWhite)
+                if (toPiece != null && toPiece.IsWhite != fromPiece.IsWhite)
                 {
-                    squares[toSquareId].Piece = squares[fromSquareId].Piece;
-                    squares[fromSquareId].Piece = null;
+                    squares[toSquareId].PieceId = squares[fromSquareId].PieceId;
+                    squares[fromSquareId].PieceId = 0;
                     return true;
                 }
             }
@@ -137,7 +152,7 @@ namespace UltraChess.Blazor.Models
 
         public void HighlightLegalMoves(int fromSquareId)
         {
-            if (squares[fromSquareId].Piece is Pawn pawn)
+            if (pieces[squares[fromSquareId].PieceId] is Pawn pawn)
             {
                 var legalSquaresToMoveTo = pawn.GetSquaresToMoveTo(fromSquareId);
                 foreach (var legalSquareToMoveTo in legalSquaresToMoveTo)

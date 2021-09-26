@@ -11,7 +11,7 @@ namespace UltraChess.Blazor.Models
             if (IsWhite)
             {
                 squaresToMoveTo.Add(fromSquare - 8);
-                if(fromSquare > 47 && fromSquare < 56)
+                if (fromSquare > 47 && fromSquare < 56)
                 {
                     squaresToMoveTo.Add(fromSquare - 16);
                 }

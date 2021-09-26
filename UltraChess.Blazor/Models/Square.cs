@@ -7,6 +7,6 @@
         public char Rank { get; set; }
         public bool IsLight { get; set; }
         public bool IsHighlighted { get; set; }
-        public Piece Piece { get; set; }
+        public int PieceId { get; set; }
     }
 }

@@ -12,9 +12,9 @@
                 <div class="rank-text">@(square.File == 'a' ? square.Rank.ToString() : "")</div>
                 <div class="file-text">@(square.Rank == '1' ? square.File.ToString() : "")</div>
                 @{
-                    if (square.Piece != null)
+                    if (square.PieceId != 0)
                     {
-                        <img id="@($"{square.File}.{square.Rank}-image")" src="@(square.Piece.Image)" @ondrag="@(()=> StartDrag(square.Id))" ondrop="event.preventDefault();" />
+                        <img id="@($"{square.File}.{square.Rank}-image")" src="@(ChessBoard.pieces[square.PieceId].Image)" @ondrag="@(()=> StartDrag(square.Id))" ondrop="event.preventDefault();" />
                     }
                 }
             </div>
@@ -30,16 +30,17 @@
     void StartDrag(int fromSquareId)
     {
         FromSquareId = fromSquareId;
+        var fromSquare = ChessBoard.squares[FromSquareId];
         if (ChessBoard.IsWhiteTurn)
         {
-            if(ChessBoard.squares[FromSquareId].Piece.IsWhite == true)
+            if(ChessBoard.pieces[fromSquare.PieceId].IsWhite == true)
             {
                 ChessBoard.HighlightLegalMoves(fromSquareId);
             }
         }
         else
         {
-            if (ChessBoard.squares[FromSquareId].Piece.IsWhite == false)
+            if (ChessBoard.pieces[fromSquare.PieceId].IsWhite == false)
             {
                 ChessBoard.HighlightLegalMoves(fromSquareId);
             }
@@ -48,7 +49,7 @@
 
     void Drop(int toSquareId)
     {
-        if (ChessBoard.squares[FromSquareId].Piece.IsWhite)
+        if (ChessBoard.pieces[ChessBoard.squares[FromSquareId].PieceId].IsWhite)
         {
             if (ChessBoard.IsWhiteTurn)
             {
