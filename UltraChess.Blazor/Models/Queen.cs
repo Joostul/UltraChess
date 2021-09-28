@@ -7,14 +7,5 @@ namespace UltraChess.Blazor.Models
 {
     public class Queen : Piece
     {
-        public override List<int> GetSquaresToCapture(int fromSquare)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override List<int> GetSquaresToMoveTo(int fromSquare)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

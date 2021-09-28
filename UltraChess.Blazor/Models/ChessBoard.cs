@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using UltraChess.Blazor.Models.Enums;
 
 namespace UltraChess.Blazor.Models
 {
@@ -7,6 +9,9 @@ namespace UltraChess.Blazor.Models
     {
         readonly char[] characters = "abcdefgh".ToCharArray();
         readonly char[] numbers = "87654321".ToCharArray();
+        public readonly int[] DirectionOffsets = { -8, 1, 8, -1, -7, 9, 7, -9 };
+        // Get number of squares to edge based on square index and direction: 0: North, 1: East, 2: South, 3: West, 4: NorthEast, 5: SouthEast, 6: SouthWest, 7: NorthWest
+        public readonly int[][] NumberOfSquaresToEdge = new int[64][];
         public Square[] squares = new Square[64];
         public Piece[] pieces = new Piece[13]
         {
@@ -34,21 +39,43 @@ namespace UltraChess.Blazor.Models
             int skip = 0;
             for (int file = 0; file < 8; file++)
             {
+                int skipped = 0;
                 for (int rank = 0; rank < 8; rank++)
                 {
+                    // Pre compute move data
+                    int squareIndex = file * 8 + rank;
+
+                    int numberNorth = file;
+                    int numberSouth = 7 - file;
+                    int numberWest = rank;
+                    int numberEast = 7 - rank;
+
+                    NumberOfSquaresToEdge[squareIndex] = new int[]
+                    {
+                        numberNorth,
+                        numberEast,
+                        numberSouth,
+                        numberWest,
+                        Math.Min(numberNorth, numberEast),
+                        Math.Min(numberSouth, numberEast),
+                        Math.Min(numberSouth, numberWest),
+                        Math.Min(numberNorth, numberWest),
+                    };
+
                     var square = new Square
                     {
-                        Id = file * 8 + rank,
+                        Id = squareIndex,
                         File = numbers[file],
                         Rank = characters[rank],
                         IsLight = (file + rank) % 2 == 0
                     };
                     if (skip == 0)
                     {
-                        var fenCharacter = FENranks[file][rank];
+                        var fenCharacter = FENranks[file][Math.Max(rank - skipped, 0)];
                         if (char.IsDigit(fenCharacter))
                         {
-                            skip = int.Parse(fenCharacter.ToString()) - 1;
+                            skipped = int.Parse(fenCharacter.ToString());
+                            skip = skipped - 1;
                         }
                         else
                         {
@@ -112,25 +139,42 @@ namespace UltraChess.Blazor.Models
             }
         }
 
-        public bool Move(int fromSquareId, int toSquareId)
+        public void Move(int fromSquareId, int toSquareId)
         {
             // TODO: Add pawn promotions
             var fromPiece = pieces[squares[fromSquareId].PieceId];
             var toPiece = pieces[squares[toSquareId].PieceId];
-            var legalSquaresToMoveTo = GetValidSquares(fromPiece.GetSquaresToMoveTo(fromSquareId));
-            var legalSquaresToCapture = GetValidSquares(fromPiece.GetSquaresToCapture(fromSquareId));
+            var legalSquaresToMoveTo = GetMovementSquares(fromSquareId);
+            var legalSquaresToCapture = GetCaptureSquares(fromSquareId, fromPiece);
             if (legalSquaresToCapture.Count < 1 && legalSquaresToMoveTo.Count < 1)
             {
-                return false;
+                return;
             }
 
+            // Remove highlighting
             foreach (var square in legalSquaresToMoveTo)
             {
                 squares[square].IsHighlighted = false;
             }
+            foreach (var square in legalSquaresToCapture)
+            {
+                squares[square].IsHighlighted = false;
+            }
+
             if (fromSquareId == toSquareId)
             {
-                return false;
+                return;
+            }
+
+            // If a capture is taking place
+            if (legalSquaresToCapture.Contains(toSquareId))
+            {
+                if (toPiece != null && toPiece.IsWhite != fromPiece.IsWhite)
+                {
+                    squares[toSquareId].PieceId = squares[fromSquareId].PieceId;
+                    squares[fromSquareId].PieceId = 0;
+                    IsWhiteTurn = !IsWhiteTurn;
+                }
             }
             if (legalSquaresToMoveTo.Contains(toSquareId))
             {
@@ -138,42 +182,107 @@ namespace UltraChess.Blazor.Models
                 {
                     squares[toSquareId].PieceId = squares[fromSquareId].PieceId;
                     squares[fromSquareId].PieceId = 0;
-                    return true;
+                    IsWhiteTurn = !IsWhiteTurn;
                 }
             }
-            if (legalSquaresToCapture.Contains(toSquareId))
-            {
-                if (toPiece != null && toPiece.IsWhite != fromPiece.IsWhite)
-                {
-                    squares[toSquareId].PieceId = squares[fromSquareId].PieceId;
-                    squares[fromSquareId].PieceId = 0;
-                    return true;
-                }
-            }
-            return false;
         }
 
-        public IEnumerable<int> GetMovementSquares(int fromSquare, Piece piece)
+        public List<int> GetMovementSquares(int fromSquareId)
         {
+            var piece = pieces[squares[fromSquareId].PieceId];
             var moves = new List<int>();
 
-            if(piece is Pawn)
+            if (piece is Pawn)
             {
                 if (piece.IsWhite)
                 {
-                    moves.Add(fromSquare - 8);
-                    if (fromSquare > 47 && fromSquare < 56)
+                    moves.Add(fromSquareId - 8);
+                    if (fromSquareId > 47 && fromSquareId < 56)
                     {
-                        moves.Add(fromSquare - 16);
+                        moves.Add(fromSquareId - 16);
                     }
                 }
                 else
                 {
-                    moves.Add(fromSquare + 8);
-                    if (fromSquare > 7 && fromSquare < 16)
+                    moves.Add(fromSquareId + 8);
+                    if (fromSquareId > 7 && fromSquareId < 16)
                     {
-                        moves.Add(fromSquare + 16);
+                        moves.Add(fromSquareId + 16);
                     }
+                }
+            }
+            else if (piece is King)
+            {
+                moves.AddRange(GenerateSlidingMoves(fromSquareId, PieceType.King));
+            } else if(piece is Rook)
+            {
+                moves.AddRange(GenerateSlidingMoves(fromSquareId, PieceType.Rook));
+            } else if(piece is Bishop)
+            {
+                moves.AddRange(GenerateSlidingMoves(fromSquareId, PieceType.Bishop));
+            } else if(piece is Queen)
+            {
+                moves.AddRange(GenerateSlidingMoves(fromSquareId, PieceType.Queen));
+            }
+
+            return GetValidSquares(moves);
+        }
+
+        List<int> GenerateSlidingMoves(int fromSquareId, PieceType pieceType)
+        {
+            var moves = new List<int>();
+
+            var maxSquaresToMove = pieceType == PieceType.King ? 1 : 7;
+
+            int startDirectionIndex = pieceType == PieceType.Bishop ? 4 : 0;
+            int endDirectionIndex = pieceType == PieceType.Rook ? 4 : 8;
+
+            // For each direction
+            for(int directionIndex = startDirectionIndex; directionIndex < endDirectionIndex; directionIndex ++)
+            {
+                // For the amount of squares that we can move
+                for(int i = 0; i < maxSquaresToMove; i++)
+                {
+                    // If we are not on the edge of the board
+                    if(NumberOfSquaresToEdge[fromSquareId][directionIndex] > i)
+                    {
+                        var toSquareId = fromSquareId + DirectionOffsets[directionIndex] * (i + 1);
+
+                        // If a piece is not blocking
+                        if(squares[toSquareId].PieceId == 0)
+                        {
+                            moves.Add(toSquareId);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return moves;
+        }
+
+        public List<int> GetCaptureSquares(int fromSquareId, Piece piece)
+        {
+            var moves = new List<int>();
+
+            if (piece is Pawn)
+            {
+                if (piece.IsWhite)
+                {
+                    moves.Add(fromSquareId - 7);
+                    moves.Add(fromSquareId - 9);
+                }
+                else
+                {
+                    moves.Add(fromSquareId + 7);
+                    moves.Add(fromSquareId + 9);
                 }
             }
 
@@ -183,8 +292,8 @@ namespace UltraChess.Blazor.Models
         public void HighlightLegalMoves(int fromSquareId)
         {
             var piece = pieces[squares[fromSquareId].PieceId];
-            var legalSquaresToMoveTo = piece.GetSquaresToMoveTo(fromSquareId);
-            var legalSquaresToCapture = piece.GetSquaresToCapture(fromSquareId);
+            var legalSquaresToMoveTo = GetMovementSquares(fromSquareId);
+            var legalSquaresToCapture = GetCaptureSquares(fromSquareId, piece);
             foreach (var legalSquareToCapture in legalSquaresToCapture)
             {
                 // Only able to capture a square if there is a piece there that is not our own color
@@ -202,7 +311,7 @@ namespace UltraChess.Blazor.Models
 
         private List<int> GetValidSquares(List<int> squares)
         {
-            return squares.Where(s => s < 64 && s > 0).ToList();
+            return squares.Where(s => s < 64 && s > 0).Distinct().ToList();
         }
     }
 }

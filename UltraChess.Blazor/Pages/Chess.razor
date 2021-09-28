@@ -42,17 +42,10 @@
 
     void Drop(int toSquareId)
     {
-        bool moveMade = false;
         var fromSquare = ChessBoard.squares[FromSquareId];
         if (ChessBoard.pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
         {
-            moveMade = ChessBoard.Move(FromSquareId, toSquareId);
+            ChessBoard.Move(FromSquareId, toSquareId);
         }
-        else
-        {
-            return;
-        }
-
-        ChessBoard.IsWhiteTurn = !ChessBoard.IsWhiteTurn;
     }
 }
