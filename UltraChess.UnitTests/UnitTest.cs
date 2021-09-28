@@ -12,8 +12,8 @@ namespace UltraChess.UnitTests
         [TestMethod]
         public void PossibleMovesFirstMove()
         {
+            var possibleMoves = 0;
             var chessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
         }
     }
 }

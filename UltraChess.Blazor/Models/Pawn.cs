@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace UltraChess.Blazor.Models
 {
@@ -7,6 +6,7 @@ namespace UltraChess.Blazor.Models
     {
         public override List<int> GetSquaresToMoveTo(int fromSquare)
         {
+            // TODO: put this on board since we need to know if something is in the way
             List<int> squaresToMoveTo = new();
             if (IsWhite)
             {

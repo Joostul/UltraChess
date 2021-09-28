@@ -9,19 +9,18 @@
         {
             <div id="@($"{square.Id}")" class="grid-item fill @(square.IsHighlighted ? "highlight" : square.IsLight ? "light" : "dark")" ondragover="event.preventDefault();" @ondrop="@(()=> Drop(square.Id))" >
 
-                <div class="rank-text">@(square.File == 'a' ? square.Rank.ToString() : "")</div>
-                <div class="file-text">@(square.Rank == '1' ? square.File.ToString() : "")</div>
+                <div class="rank-text">@(square.Rank == 'a' ? square.File.ToString() : "")</div>
+                <div class="file-text">@(square.File == '1' ? square.Rank.ToString() : "")</div>
                 @{
                     if (square.PieceId != 0)
                     {
-                        <img id="@($"{square.File}.{square.Rank}-image")" src="@(ChessBoard.pieces[square.PieceId].Image)" @ondrag="@(()=> StartDrag(square.Id))" ondrop="event.preventDefault();" />
+                        <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessBoard.pieces[square.PieceId].Image)" @ondrag="@(()=> StartDrag(square.Id))" ondrop="event.preventDefault();" />
                     }
                 }
             </div>
         }
     }
 </div>
-
 
 @code {
     private ChessBoard ChessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -31,45 +30,29 @@
     {
         FromSquareId = fromSquareId;
         var fromSquare = ChessBoard.squares[FromSquareId];
-        if (ChessBoard.IsWhiteTurn)
+        if(ChessBoard.pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
         {
-            if(ChessBoard.pieces[fromSquare.PieceId].IsWhite == true)
-            {
-                ChessBoard.HighlightLegalMoves(fromSquareId);
-            }
+            ChessBoard.HighlightLegalMoves(fromSquareId);
         }
         else
         {
-            if (ChessBoard.pieces[fromSquare.PieceId].IsWhite == false)
-            {
-                ChessBoard.HighlightLegalMoves(fromSquareId);
-            }
+            return;
         }
     }
 
     void Drop(int toSquareId)
     {
-        if (ChessBoard.pieces[ChessBoard.squares[FromSquareId].PieceId].IsWhite)
+        bool moveMade = false;
+        var fromSquare = ChessBoard.squares[FromSquareId];
+        if (ChessBoard.pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
         {
-            if (ChessBoard.IsWhiteTurn)
-            {
-                var moveMade = ChessBoard.Move(FromSquareId, toSquareId);
-                if (moveMade)
-                {
-                    ChessBoard.IsWhiteTurn = false;
-                }
-            }
+            moveMade = ChessBoard.Move(FromSquareId, toSquareId);
         }
         else
         {
-            if (!ChessBoard.IsWhiteTurn)
-            {
-                var moveMade = ChessBoard.Move(FromSquareId, toSquareId);
-                if (moveMade)
-                {
-                    ChessBoard.IsWhiteTurn = true;
-                }
-            }
+            return;
         }
+
+        ChessBoard.IsWhiteTurn = !ChessBoard.IsWhiteTurn;
     }
 }

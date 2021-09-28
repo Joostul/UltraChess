@@ -32,20 +32,20 @@ namespace UltraChess.Blazor.Models
             IsWhiteTurn = FENpieces[1][0] == 'w';
             string[] FENranks = FENpieces[0].Split('/');
             int skip = 0;
-            for (int rank = 7; rank >= 0; rank--)
+            for (int file = 0; file < 8; file++)
             {
-                for (int file = 0; file < 8; file++)
+                for (int rank = 0; rank < 8; rank++)
                 {
                     var square = new Square
                     {
-                        Id = rank * 8 + file,
-                        File = characters[file],
-                        Rank = numbers[rank],
-                        IsLight = (file + rank) % 2 != 0
+                        Id = file * 8 + rank,
+                        File = numbers[file],
+                        Rank = characters[rank],
+                        IsLight = (file + rank) % 2 == 0
                     };
                     if (skip == 0)
                     {
-                        var fenCharacter = FENranks[rank][file];
+                        var fenCharacter = FENranks[file][rank];
                         if (char.IsDigit(fenCharacter))
                         {
                             skip = int.Parse(fenCharacter.ToString()) - 1;
@@ -84,11 +84,11 @@ namespace UltraChess.Blazor.Models
                             {
                                 square.PieceId = 8;
                             }
-                            else if (fenCharacter == 'b')
+                            else if (fenCharacter == 'r')
                             {
                                 square.PieceId = 9;
                             }
-                            else if (fenCharacter == 'r')
+                            else if (fenCharacter == 'b')
                             {
                                 square.PieceId = 10;
                             }
@@ -153,9 +153,47 @@ namespace UltraChess.Blazor.Models
             return false;
         }
 
+        public IEnumerable<int> GetMovementSquares(int fromSquare, Piece piece)
+        {
+            var moves = new List<int>();
+
+            if(piece is Pawn)
+            {
+                if (piece.IsWhite)
+                {
+                    moves.Add(fromSquare - 8);
+                    if (fromSquare > 47 && fromSquare < 56)
+                    {
+                        moves.Add(fromSquare - 16);
+                    }
+                }
+                else
+                {
+                    moves.Add(fromSquare + 8);
+                    if (fromSquare > 7 && fromSquare < 16)
+                    {
+                        moves.Add(fromSquare + 16);
+                    }
+                }
+            }
+
+            return GetValidSquares(moves);
+        }
+
         public void HighlightLegalMoves(int fromSquareId)
         {
-            var legalSquaresToMoveTo = pieces[squares[fromSquareId].PieceId].GetSquaresToMoveTo(fromSquareId);
+            var piece = pieces[squares[fromSquareId].PieceId];
+            var legalSquaresToMoveTo = piece.GetSquaresToMoveTo(fromSquareId);
+            var legalSquaresToCapture = piece.GetSquaresToCapture(fromSquareId);
+            foreach (var legalSquareToCapture in legalSquaresToCapture)
+            {
+                // Only able to capture a square if there is a piece there that is not our own color
+                if (squares[legalSquareToCapture].PieceId != 0 && pieces[squares[legalSquareToCapture].PieceId].IsWhite != piece.IsWhite)
+                {
+                    legalSquaresToMoveTo.Add(legalSquareToCapture);
+                }
+            }
+
             foreach (var legalSquareToMoveTo in legalSquaresToMoveTo)
             {
                 squares[legalSquareToMoveTo].IsHighlighted = true;
