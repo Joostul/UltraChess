@@ -5,7 +5,7 @@
 
 <div class="grid-container">
     @{
-        foreach (var square in ChessBoard.squares)
+        foreach (var square in ChessBoard.Squares)
         {
             <div id="@($"{square.Id}")" class="grid-item fill @(square.IsHighlighted ? "highlight" : square.IsLight ? "light" : "dark")" ondragover="event.preventDefault();" @ondrop="@(()=> Drop(square.Id))" >
 
@@ -14,7 +14,7 @@
                 @{
                     if (square.PieceId != 0)
                     {
-                        <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessBoard.pieces[square.PieceId].Image)" @ondrag="@(()=> StartDrag(square.Id))" ondrop="event.preventDefault();" />
+                        <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessBoard.Pieces[square.PieceId].Image)" @ondrag="@(()=> StartDrag(square.Id))" ondrop="event.preventDefault();" />
                     }
                 }
             </div>
@@ -29,8 +29,8 @@
     void StartDrag(int fromSquareId)
     {
         FromSquareId = fromSquareId;
-        var fromSquare = ChessBoard.squares[FromSquareId];
-        if(ChessBoard.pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
+        var fromSquare = ChessBoard.Squares[FromSquareId];
+        if(ChessBoard.Pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
         {
             ChessBoard.HighlightLegalMoves(fromSquareId);
         }
@@ -42,8 +42,8 @@
 
     void Drop(int toSquareId)
     {
-        var fromSquare = ChessBoard.squares[FromSquareId];
-        if (ChessBoard.pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
+        var fromSquare = ChessBoard.Squares[FromSquareId];
+        if (ChessBoard.Pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
         {
             ChessBoard.Move(FromSquareId, toSquareId);
         }

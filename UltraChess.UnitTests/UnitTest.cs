@@ -12,7 +12,7 @@ namespace UltraChess.UnitTests
             var possibleMoves = 0;
             var chessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-            foreach (var square in chessBoard.squares)
+            foreach (var square in chessBoard.Squares)
             {
                 if(square.PieceId != 0)
                 {
