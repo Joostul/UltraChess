@@ -69,14 +69,22 @@ namespace UltraChess.Blazor.Models
                     {
                         var squareToJumpTo = squareIndex + knightJumpDelta;
 
+                        // Check if knight jump is inside board range
                         if (squareToJumpTo >= 0 && squareToJumpTo < 64)
                         {
-                            // TODO: check if not moving to other side of board
-                            legalKnightJumps.Add(squareToJumpTo);
+                            int knightSquareY = squareToJumpTo / 8;
+                            int knightSquareX = squareToJumpTo - knightSquareY * 8;
+
+                            // Check if knight didn't move to other side of board
+                            var maxMoveDistance = Math.Max(Math.Abs(rank - knightSquareX), Math.Abs(file - knightSquareY));
+
+                            if(maxMoveDistance == 2)
+                            {
+                                legalKnightJumps.Add(squareToJumpTo);
+                            }
                         }
                     }
                     KnightMoves[squareIndex] = legalKnightJumps.ToArray();
-
 
                     var square = new Square
                     {
@@ -164,7 +172,6 @@ namespace UltraChess.Blazor.Models
             {
                 return;
             }
-
             // Remove highlighting
             foreach (var square in legalSquaresToMoveTo)
             {
@@ -207,44 +214,7 @@ namespace UltraChess.Blazor.Models
 
             if (piece is Pawn)
             {
-                if (piece.IsWhite)
-                {
-                    // Pawns can move up one
-                    moves.Add(fromSquareId + DirectionOffsets[0]);
-                    // Or two from the starting rank
-                    if (fromSquareId > 47 && fromSquareId < 56)
-                    {
-                        moves.Add(fromSquareId + (DirectionOffsets[0] * 2));
-                    }
-                    // And can capture diagonally
-                    var diagonalCaptures = GenerateSlidingMoves(fromSquareId, 4, 6, 1);
-                    foreach (var diagonalCapture in diagonalCaptures)
-                    {
-                        if (Squares[diagonalCapture].PieceId != 0 && !Pieces[Squares[diagonalCapture].PieceId].IsWhite)
-                        {
-                            moves.Add(diagonalCapture);
-                        }
-                    }
-                }
-                else
-                {
-                    // Pawns can move up one
-                    moves.Add(fromSquareId + DirectionOffsets[2]);
-                    // Or two from the starting rank
-                    if (fromSquareId > 7 && fromSquareId < 16)
-                    {
-                        moves.Add(fromSquareId + (DirectionOffsets[2] * 2));
-                    }
-                    // And can capture diagonally
-                    var diagonalCaptures = GenerateSlidingMoves(fromSquareId, 6, 8, 1);
-                    foreach (var diagonalCapture in diagonalCaptures)
-                    {
-                        if (Squares[diagonalCapture].PieceId != 0 && Pieces[Squares[diagonalCapture].PieceId].IsWhite)
-                        {
-                            moves.Add(diagonalCapture);
-                        }
-                    }
-                }
+                moves.AddRange(GeneratePawnMoves(fromSquareId));
             }
             else if (piece is King)
             {
@@ -268,6 +238,54 @@ namespace UltraChess.Blazor.Models
             }
 
             return GetValidSquares(moves);
+        }
+
+        List<int> GeneratePawnMoves(int fromSquareId)
+        {
+            var piece = Pieces[Squares[fromSquareId].PieceId];
+            var moves = new List<int>();
+
+            // TODO: make more efficient
+            if (piece.IsWhite)
+            {
+                // Pawns can move up one
+                moves.Add(fromSquareId + DirectionOffsets[0]);
+                // Or two from the starting rank
+                if (fromSquareId > 47 && fromSquareId < 56)
+                {
+                    moves.Add(fromSquareId + (DirectionOffsets[0] * 2));
+                }
+                // And can capture diagonally
+                var diagonalCaptures = GenerateSlidingMoves(fromSquareId, 4, 6, 1);
+                foreach (var diagonalCapture in diagonalCaptures)
+                {
+                    if (Squares[diagonalCapture].PieceId != 0 && !Pieces[Squares[diagonalCapture].PieceId].IsWhite)
+                    {
+                        moves.Add(diagonalCapture);
+                    }
+                }
+            }
+            else
+            {
+                // Pawns can move up one
+                moves.Add(fromSquareId + DirectionOffsets[2]);
+                // Or two from the starting rank
+                if (fromSquareId > 7 && fromSquareId < 16)
+                {
+                    moves.Add(fromSquareId + (DirectionOffsets[2] * 2));
+                }
+                // And can capture diagonally
+                var diagonalCaptures = GenerateSlidingMoves(fromSquareId, 6, 8, 1);
+                foreach (var diagonalCapture in diagonalCaptures)
+                {
+                    if (Squares[diagonalCapture].PieceId != 0 && Pieces[Squares[diagonalCapture].PieceId].IsWhite)
+                    {
+                        moves.Add(diagonalCapture);
+                    }
+                }
+            }
+
+            return moves;
         }
 
         List<int> GenerateKnightMoves(int fromSquareId)
@@ -333,27 +351,6 @@ namespace UltraChess.Blazor.Models
             }
 
             return moves;
-        }
-
-        public List<int> GetCaptureSquares(int fromSquareId, Piece piece)
-        {
-            var moves = new List<int>();
-
-            if (piece is Pawn)
-            {
-                if (piece.IsWhite)
-                {
-                    moves.Add(fromSquareId - 7);
-                    moves.Add(fromSquareId - 9);
-                }
-                else
-                {
-                    moves.Add(fromSquareId + 7);
-                    moves.Add(fromSquareId + 9);
-                }
-            }
-
-            return GetValidSquares(moves);
         }
 
         public void HighlightLegalMoves(int fromSquareId)
