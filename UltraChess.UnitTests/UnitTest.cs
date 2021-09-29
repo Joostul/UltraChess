@@ -1,7 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Shouldly;
-using System.Collections.Generic;
-using System.Linq;
 using UltraChess.Blazor.Models;
 
 namespace UltraChess.UnitTests
@@ -14,6 +11,15 @@ namespace UltraChess.UnitTests
         {
             var possibleMoves = 0;
             var chessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+            foreach (var square in chessBoard.squares)
+            {
+                if(square.PieceId != 0)
+                {
+                    var moves = chessBoard.GetMovementSquares(square.Id);
+                    possibleMoves += moves.Count;
+                }
+            }
         }
     }
 }
