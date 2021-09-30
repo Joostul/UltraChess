@@ -12,7 +12,10 @@ namespace UltraChess.UnitTests.Pieces
         public void GetKnightMoves_DefaultBoard_SquareIndex1()
         {
             // Arrange
-            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+            {
+                IsWhiteTurn = false
+            };
 
             // Act
             var moves = sut.GetMovementSquares(1);

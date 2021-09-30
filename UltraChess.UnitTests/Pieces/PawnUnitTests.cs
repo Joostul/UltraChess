@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 using System.Collections.Generic;
+using System.Linq;
 using UltraChess.Blazor.Models;
 
 namespace UltraChess.UnitTests.Pieces
@@ -18,7 +19,7 @@ namespace UltraChess.UnitTests.Pieces
             var moves = sut.GetMovementSquares(8);
 
             // Assert
-            moves.ShouldBe(new List<int> { 16, 24 });
+            moves.ShouldBe(new List<int> { });
         }
 
         [TestMethod]
@@ -44,7 +45,24 @@ namespace UltraChess.UnitTests.Pieces
             var moves = sut.GetMovementSquares(36);
 
             // Assert
-            moves.ShouldBe(new List<int> { 28, 27 });
+            moves.OrderBy(m => m).ShouldBe(new List<int> { 27, 28 });
+        }
+
+        [TestMethod]
+        public void GetPawnMoves_EnPassant()
+        {
+            // Arrange
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            sut.Move(52, 36);
+            sut.Move(8, 16);
+            sut.Move(36, 28);
+            sut.Move(11, 27);
+
+            // Act
+            var moves = sut.GetMovementSquares(28);
+
+            // Assert
+            moves.OrderBy(m => m).ShouldBe(new List<int> { 19, 20 });
         }
     }
 }

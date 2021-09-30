@@ -7,7 +7,7 @@
     @{
         foreach (var square in ChessBoard.Squares)
         {
-            <div id="@($"{square.Id}")" class="grid-item fill @(square.IsHighlighted ? "highlight" : square.IsLight ? "light" : "dark")" ondragover="event.preventDefault();" @ondrop="@(()=> Drop(square.Id))" >
+            <div id="@($"{square.Id}")" class="grid-item fill @(square.IsHighlighted ? "highlight" : square.IsLight ? "light" : "dark")" ondragover="event.preventDefault();" @ondrop="@(()=> Drop(square.Id))">
 
                 <div class="rank-text">@(square.Rank == 'a' ? square.File.ToString() : "")</div>
                 <div class="file-text">@(square.File == '1' ? square.Rank.ToString() : "")</div>
@@ -30,22 +30,12 @@
     {
         FromSquareId = fromSquareId;
         var fromSquare = ChessBoard.Squares[FromSquareId];
-        if(ChessBoard.Pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
-        {
-            ChessBoard.HighlightLegalMoves(fromSquareId);
-        }
-        else
-        {
-            return;
-        }
+        ChessBoard.HighlightLegalMoves(fromSquareId);
     }
 
     void Drop(int toSquareId)
     {
         var fromSquare = ChessBoard.Squares[FromSquareId];
-        if (ChessBoard.Pieces[fromSquare.PieceId].IsWhite == ChessBoard.IsWhiteTurn)
-        {
-            ChessBoard.Move(FromSquareId, toSquareId);
-        }
+        ChessBoard.Move(FromSquareId, toSquareId);
     }
 }
