@@ -3,6 +3,35 @@
 
 <h3>Chess</h3>
 
+<div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" id="autopromotequeen" checked @onclick="ToggleAutoPromote" />
+    <label class="form-check-label" for="autopromotequeen">Automatically promote to a queen.</label>
+</div>
+
+<div class="@modalClass" tabindex="-1" style="display: @displayMode;">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <img id="queen-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/Q_W.png" : "img/Q_B.png")" @onclick="() => SelectPromotionPiece(2)"/>
+                </div>
+                <div class="mb-3">
+                    <img id="knight-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/N_W.png" : "img/N_B.png")" @onclick="() => SelectPromotionPiece(1)" />
+                </div>
+                <div class="mb-3">
+                    <img id="rook-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/R_W.png" : "img/R_B.png")" @onclick="() => SelectPromotionPiece(3)" />
+                </div>
+                <div class="mb-3">
+                    <img id="bishop-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/B_W.png" : "img/B_B.png")" @onclick="() => SelectPromotionPiece(4)" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="grid-container">
     @{
         foreach (var square in ChessBoard.Squares)
@@ -23,8 +52,12 @@
 </div>
 
 @code {
+    string modalClass => ChessBoard.PromotionModalIsOpen ? "modal fade show" : "modal fade";
+    string displayMode => ChessBoard.PromotionModalIsOpen ? "block" : "none";
+
     private ChessBoard ChessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     private int FromSquareId;
+    private int ToSquareId;
 
     void StartDrag(int fromSquareId)
     {
@@ -35,7 +68,69 @@
 
     void Drop(int toSquareId)
     {
+        ToSquareId = toSquareId;
         var fromSquare = ChessBoard.Squares[FromSquareId];
         ChessBoard.Move(FromSquareId, toSquareId);
+    }
+
+    void ToggleAutoPromote()
+    {
+        ChessBoard.AutoPromoteQueen = !ChessBoard.AutoPromoteQueen;
+    }
+
+    private void ToggleModal()
+    {
+        ChessBoard.PromotionModalIsOpen = !ChessBoard.PromotionModalIsOpen;
+        StateHasChanged();
+    }
+
+    void ShowModal()
+    {
+        ChessBoard.PromotionModalIsOpen = true;
+    }
+
+    private void SelectPromotionPiece(int id)
+    {
+        var promotionPiece = ChessBoard.PromotionPiece[Convert.ToInt32(ChessBoard.IsWhiteTurn)];
+        if (ChessBoard.IsWhiteTurn)
+        {
+            if (id == 1)
+            {
+                promotionPiece = 2;
+            }
+            if (id == 2)
+            {
+                promotionPiece = 5;
+            }
+            if (id == 3)
+            {
+                promotionPiece = 4;
+            }
+            if (id == 4)
+            {
+                promotionPiece = 3;
+            }
+        }
+        else
+        {
+            if (id == 1)
+            {
+                promotionPiece = 8;
+            }
+            if (id == 2)
+            {
+                promotionPiece = 11;
+            }
+            if (id == 3)
+            {
+                promotionPiece = 9;
+            }
+            if (id == 4)
+            {
+                promotionPiece = 10;
+            }
+        }
+        ChessBoard.PromotionModalIsOpen = false;
+        ChessBoard.MovePiece(FromSquareId, ToSquareId, promotionPiece);
     }
 }
