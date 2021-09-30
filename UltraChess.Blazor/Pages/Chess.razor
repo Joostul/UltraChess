@@ -9,7 +9,7 @@
 </div>
 
 <div class="@modalClass" tabindex="-1" style="display: @displayMode;">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Modal title</h5>
@@ -18,10 +18,18 @@
                 </button>
             </div>
             <div class="modal-body">
-                <button class="btn btn-primary" @onclick="() => SelectPromotionPiece(1)">Horse</button>
-                <button class="btn btn-primary" @onclick="() => SelectPromotionPiece(2)">Queen</button>
-                <button class="btn btn-primary" @onclick="() => SelectPromotionPiece(3)">Rook</button>
-                <button class="btn btn-primary" @onclick="() => SelectPromotionPiece(4)">Bishop</button>
+                <div class="mb-3">
+                    <img id="queen-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/Q_W.png" : "img/Q_B.png")" @onclick="() => SelectPromotionPiece(2)"/>
+                </div>
+                <div class="mb-3">
+                    <img id="knight-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/N_W.png" : "img/N_B.png")" @onclick="() => SelectPromotionPiece(1)" />
+                </div>
+                <div class="mb-3">
+                    <img id="rook-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/R_W.png" : "img/R_B.png")" @onclick="() => SelectPromotionPiece(3)" />
+                </div>
+                <div class="mb-3">
+                    <img id="bishop-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/B_W.png" : "img/B_B.png")" @onclick="() => SelectPromotionPiece(4)" />
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" @onclick="ToggleModal">Close</button>
@@ -80,6 +88,11 @@
     {
         ChessBoard.PromotionModalIsOpen = !ChessBoard.PromotionModalIsOpen;
         StateHasChanged();
+    }
+
+    void ShowModal()
+    {
+        ChessBoard.PromotionModalIsOpen = true;
     }
 
     private void SelectPromotionPiece(int id)
