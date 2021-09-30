@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UltraChess.Blazor.Models;
 
-namespace UltraChess.UnitTests.Models
+namespace UltraChess.UnitTests.Pieces
 {
     [TestClass]
     public class KingUnitTests
