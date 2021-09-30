@@ -2,7 +2,7 @@
 using Shouldly;
 using UltraChess.Blazor.Models;
 
-namespace UltraChess.UnitTests.Models
+namespace UltraChess.UnitTests.Board
 {
     [TestClass]
     public class ChessBoardUnitTests
