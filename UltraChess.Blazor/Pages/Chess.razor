@@ -64,16 +64,16 @@
         ChessBoard.HighlightLegalMoves(fromSquareId);
     }
 
-    void ToggleAutoPromote()
-    {
-        ChessBoard.AutoPromoteQueen = !ChessBoard.AutoPromoteQueen;
-    }
-
     void Drop(int toSquareId)
     {
         ToSquareId = toSquareId;
         var fromSquare = ChessBoard.Squares[FromSquareId];
         ChessBoard.Move(FromSquareId, toSquareId);
+    }
+
+    void ToggleAutoPromote()
+    {
+        ChessBoard.AutoPromoteQueen = !ChessBoard.AutoPromoteQueen;
     }
 
     private void ToggleModal()
