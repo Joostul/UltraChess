@@ -88,8 +88,8 @@ namespace UltraChess.Blazor.Models
                     var square = new Square
                     {
                         Id = squareIndex,
-                        File = numbers[file],
-                        Rank = characters[rank],
+                        Rank = numbers[file],
+                        File = characters[rank],
                         IsLight = (file + rank) % 2 == 0
                     };
                     var fenCharacter = boardFENCharacters[squareIndex];
@@ -199,7 +199,7 @@ namespace UltraChess.Blazor.Models
                 var promotionRank = piece.IsWhite ? '8' : '1';
                 var promotionPiece = piece.IsWhite ? 5 : 11;
                 // Check for pawn promotion
-                if (piece is Pawn && Squares[toSquareId].File == promotionRank)
+                if (piece is Pawn && Squares[toSquareId].Rank == promotionRank)
                 {
                     MovePiece(fromSquareId, toSquareId, promotionPiece);
                 }
@@ -233,11 +233,11 @@ namespace UltraChess.Blazor.Models
             {
                 if (piece.IsWhite)
                 {
-                    moves.AddRange(GeneratePawnMoves(fromSquareId, 0, 4, 6, 2));
+                    moves.AddRange(GeneratePawnMoves(fromSquareId, 0, 4, 6, true));
                 }
                 else
                 {
-                    moves.AddRange(GeneratePawnMoves(fromSquareId, 1, 6, 8, 7));
+                    moves.AddRange(GeneratePawnMoves(fromSquareId, 1, 6, 8, false));
                 }
             }
             else if (piece is King)
@@ -264,26 +264,22 @@ namespace UltraChess.Blazor.Models
             return GetValidSquares(moves);
         }
 
-        List<int> GeneratePawnMoves(int fromSquareId, int direction, int startDirectionIndex, int endDirectionIndex, int startRank)
+        List<int> GeneratePawnMoves(int fromSquareId, int direction, int startDirectionIndex, int endDirectionIndex, bool isWhite)
         {
             var piece = GetPiece(fromSquareId);
             var moves = new List<int>();
             int rankStartSquareIndex;
             int rankEndSquareIndex;
 
-            if (startRank == 2)
+            if (isWhite)
             {
                 rankStartSquareIndex = 47;
                 rankEndSquareIndex = 56;
             }
-            else if (startRank == 7)
+            else
             {
                 rankStartSquareIndex = 7;
                 rankEndSquareIndex = 16;
-            }
-            else
-            {
-                throw new Exception();
             }
 
             // Pawns can move up one
