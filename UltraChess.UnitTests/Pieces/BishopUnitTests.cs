@@ -38,7 +38,10 @@ namespace UltraChess.UnitTests.Pieces
         public void GetSlidingMovesTest_OnlyBishopOnBoard_SquareIndex0()
         {
             // Arrange
-            var sut = new ChessBoard("b7/8/8/8/8/8/8/8 w KQkq - 0 1");
+            var sut = new ChessBoard("b7/8/8/8/8/8/8/8 w KQkq - 0 1")
+            {
+                IsWhiteTurn = false
+            };
 
             // Act
             var moves = sut.GetMovementSquares(0);
