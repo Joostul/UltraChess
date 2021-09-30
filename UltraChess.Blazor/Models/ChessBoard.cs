@@ -14,6 +14,7 @@ namespace UltraChess.Blazor.Models
         public readonly int[][] NumberOfSquaresToEdge = new int[64][];
         public readonly int[] AllKnightJumps = { 15, 17, -17, -15, 10, -6, 6, -10 };
         public readonly int[][] KnightMoves = new int[64][];
+        public int[] PromotionPiece = new int[2] { 11, 5 };
         public Square[] Squares = new Square[64];
         public Piece[] Pieces = new Piece[13]
         {
@@ -33,6 +34,8 @@ namespace UltraChess.Blazor.Models
         };
         public bool IsWhiteTurn;
         public int EnPassantSquare = 64;
+        public bool PromotionModalIsOpen;
+        public bool AutoPromoteQueen = true;
 
         public ChessBoard(string FEN)
         {
@@ -197,11 +200,18 @@ namespace UltraChess.Blazor.Models
             {
                 var piece = GetPiece(fromSquareId);
                 var promotionRank = piece.IsWhite ? '8' : '1';
-                var promotionPiece = piece.IsWhite ? 5 : 11;
                 // Check for pawn promotion
                 if (piece is Pawn && Squares[toSquareId].Rank == promotionRank)
                 {
-                    MovePiece(fromSquareId, toSquareId, promotionPiece);
+                    if (!AutoPromoteQueen)
+                    {
+                        // Open modal
+                        PromotionModalIsOpen = true;
+                    }
+                    else
+                    {
+                        MovePiece(fromSquareId, toSquareId, PromotionPiece[Convert.ToInt32(piece.IsWhite)]);
+                    }
                 }
                 else
                 {
@@ -210,7 +220,7 @@ namespace UltraChess.Blazor.Models
             }
         }
 
-        void MovePiece(int fromSquareId, int toSquareId, int promotionPiece = 0)
+        public void MovePiece(int fromSquareId, int toSquareId, int promotionPiece = 0)
         {
             if (Squares[toSquareId].PieceId == 0 || SquareContainsEnemyPiece(GetPiece(fromSquareId).IsWhite, toSquareId))
             {
