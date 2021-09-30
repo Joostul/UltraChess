@@ -207,8 +207,8 @@ namespace UltraChess.Blazor.Models
                 }
                 else
                 {
-                    var fromPiece = Pieces[Squares[fromSquareId].PieceId];
-                    var toPiece = Pieces[Squares[toSquareId].PieceId];
+                    var fromPiece = GetPiece(fromSquareId);
+                    var toPiece = GetPiece(toSquareId);
 
                     if (toPiece.IsWhite != fromPiece.IsWhite)
                     {
@@ -229,8 +229,8 @@ namespace UltraChess.Blazor.Models
         public List<int> GetMovementSquares(int fromSquareId)
         {
             var moves = new List<int>();
-            var piece = Pieces[Squares[fromSquareId].PieceId];
-            if(piece.IsWhite != IsWhiteTurn)
+            var piece = GetPiece(fromSquareId);
+            if (piece.IsWhite != IsWhiteTurn)
             {
                 return moves;
             }
@@ -272,7 +272,7 @@ namespace UltraChess.Blazor.Models
 
         List<int> GeneratePawnMoves(int fromSquareId, int direction, int startDirectionIndex, int endDirectionIndex, int startRank)
         {
-            var piece = Pieces[Squares[fromSquareId].PieceId];
+            var piece = GetPiece(fromSquareId);
             var moves = new List<int>();
             int rankStartSquareIndex;
             int rankEndSquareIndex;
@@ -333,7 +333,7 @@ namespace UltraChess.Blazor.Models
                 if (Squares[squareId].PieceId != 0)
                 {
                     // If it's not your own piece
-                    if (Pieces[Squares[squareId].PieceId].IsWhite != Pieces[Squares[fromSquareId].PieceId].IsWhite)
+                    if (GetPiece(squareId).IsWhite != GetPiece(fromSquareId).IsWhite)
                     {
                         moves.Add(squareId);
                     }
@@ -370,7 +370,7 @@ namespace UltraChess.Blazor.Models
                         else
                         {
                             // If that piece is not your own color
-                            if (Pieces[Squares[toSquareId].PieceId].IsWhite != Pieces[Squares[fromSquareId].PieceId].IsWhite)
+                            if (GetPiece(toSquareId).IsWhite != GetPiece(fromSquareId).IsWhite)
                             {
                                 // Able to capture
                                 moves.Add(toSquareId);
@@ -398,7 +398,7 @@ namespace UltraChess.Blazor.Models
             }
         }
 
-        private List<int> GetValidSquares(List<int> squares)
+        private static List<int> GetValidSquares(List<int> squares)
         {
             return squares.Where(s => s < 64 && s > 0).Distinct().ToList();
         }
@@ -411,7 +411,12 @@ namespace UltraChess.Blazor.Models
         private bool SquareContainsEnemyPiece(bool pieceIsWhite, int toSquareId)
         {
             var toSquarePieceId = Squares[toSquareId].PieceId;
-            return toSquarePieceId != 0 && Pieces[Squares[toSquareId].PieceId].IsWhite != pieceIsWhite;
+            return toSquarePieceId != 0 && GetPiece(toSquareId).IsWhite != pieceIsWhite;
+        }
+
+        private Piece GetPiece(int squareId)
+        {
+            return Pieces[Squares[squareId].PieceId];
         }
     }
 }
