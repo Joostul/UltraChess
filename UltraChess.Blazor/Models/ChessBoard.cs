@@ -36,7 +36,7 @@ namespace UltraChess.Blazor.Models
         public ChessBoard(string FEN)
         {
             IsWhiteTurn = FEN.Split(' ')[1][0] == 'w';
-            var board = FENUtility.ParseFENString(FEN);
+            var boardFENCharacters = FENUtility.ParseFENString(FEN);
             for (int file = 0; file < 8; file++)
             {
                 for (int rank = 0; rank < 8; rank++)
@@ -91,7 +91,7 @@ namespace UltraChess.Blazor.Models
                         Rank = characters[rank],
                         IsLight = (file + rank) % 2 == 0
                     };
-                    var fenCharacter = board[squareIndex];
+                    var fenCharacter = boardFENCharacters[squareIndex];
                     if (fenCharacter == 'P')
                     {
                         square.PieceId = 1;
