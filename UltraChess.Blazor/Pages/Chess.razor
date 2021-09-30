@@ -4,7 +4,7 @@
 <h3>Chess</h3>
 
 <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" id="autopromotequeen" checked @onclick="ToggleAutoPromote"/>
+    <input class="form-check-input" type="checkbox" id="autopromotequeen" checked @onclick="ToggleAutoPromote" />
     <label class="form-check-label" for="autopromotequeen">Automatically promote to a queen.</label>
 </div>
 
@@ -18,10 +18,10 @@
                 </button>
             </div>
             <div class="modal-body">
-                <button @onclick="() => SelectPromotionPiece(1)">Horse</button>
-                <button @onclick="() => SelectPromotionPiece(2)">Queen</button>
-                <button @onclick="() => SelectPromotionPiece(3)">Rook</button>
-                <button @onclick="() => SelectPromotionPiece(4)">Bishop</button>
+                <button class="btn btn-primary" @onclick="() => SelectPromotionPiece(1)">Horse</button>
+                <button class="btn btn-primary" @onclick="() => SelectPromotionPiece(2)">Queen</button>
+                <button class="btn btn-primary" @onclick="() => SelectPromotionPiece(3)">Rook</button>
+                <button class="btn btn-primary" @onclick="() => SelectPromotionPiece(4)">Bishop</button>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" @onclick="ToggleModal">Close</button>
@@ -91,7 +91,7 @@
             {
                 promotionPiece = 2;
             }
-            if(id == 2)
+            if (id == 2)
             {
                 promotionPiece = 5;
             }
