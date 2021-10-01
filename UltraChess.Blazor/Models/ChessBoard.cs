@@ -228,7 +228,7 @@ namespace UltraChess.Blazor.Models
             }
         }
 
-        public List<int> GetMovementSquares(int fromSquareId, bool setEnPassantSquare)
+        public List<int> GetMovementSquares(int fromSquareId, bool setEnPassantSquare = false)
         {
             var moves = new List<int>();
             var piece = GetPiece(fromSquareId);
@@ -391,7 +391,7 @@ namespace UltraChess.Blazor.Models
 
         public void HighlightLegalMoves(int fromSquareId)
         {
-            var legalSquaresToMoveTo = GetMovementSquares(fromSquareId, false);
+            var legalSquaresToMoveTo = GetMovementSquares(fromSquareId);
 
             foreach (var legalSquareToMoveTo in legalSquaresToMoveTo)
             {
