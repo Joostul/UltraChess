@@ -16,16 +16,16 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <img id="queen-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/Q_W.png" : "img/Q_B.png")" @onclick="() => SelectPromotionPiece(2)"/>
+                    <img id="queen-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/Q_W.png" : "img/Q_B.png")" @onclick="() => SelectPromotionPiece(3)" />
                 </div>
                 <div class="mb-3">
-                    <img id="knight-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/N_W.png" : "img/N_B.png")" @onclick="() => SelectPromotionPiece(1)" />
+                    <img id="knight-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/N_W.png" : "img/N_B.png")" @onclick="() => SelectPromotionPiece(0)" />
                 </div>
                 <div class="mb-3">
-                    <img id="rook-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/R_W.png" : "img/R_B.png")" @onclick="() => SelectPromotionPiece(3)" />
+                    <img id="rook-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/R_W.png" : "img/R_B.png")" @onclick="() => SelectPromotionPiece(2)" />
                 </div>
                 <div class="mb-3">
-                    <img id="bishop-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/B_W.png" : "img/B_B.png")" @onclick="() => SelectPromotionPiece(4)" />
+                    <img id="bishop-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/B_W.png" : "img/B_B.png")" @onclick="() => SelectPromotionPiece(1)" />
                 </div>
             </div>
         </div>
@@ -36,14 +36,14 @@
     @{
         foreach (var square in ChessBoard.Squares)
         {
-            <div id="@($"{square.Id}")" class="grid-item fill @(square.IsHighlighted ? "highlight" : square.IsLight ? "light" : "dark")" ondragover="event.preventDefault();" @ondrop="@(()=> Drop(square.Id))">
+            <div id="@($"{square.Id}")" class="grid-item fill @(square.IsHighlighted ? "highlight" : square.IsLight ? "light" : "dark")" ondragover="event.preventDefault();" @ondrop="@(() => Drop(square.Id))">
 
                 <div class="rank-text">@(square.Rank == 'a' ? square.File.ToString() : "")</div>
                 <div class="file-text">@(square.File == '1' ? square.Rank.ToString() : "")</div>
                 @{
                     if (square.PieceId != 0)
                     {
-                        <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessBoard.Pieces[square.PieceId].Image)" @ondrag="@(()=> StartDrag(square.Id))" ondrop="event.preventDefault();" />
+                        <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessBoard.Pieces[square.PieceId].Image)" @ondrag="@(() => StartDrag(square.Id))" ondrop="event.preventDefault();" />
                     }
                 }
             </div>
@@ -56,6 +56,7 @@
     string displayMode => ChessBoard.PromotionModalIsOpen ? "block" : "none";
 
     private ChessBoard ChessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    private readonly int[][] PromotionPieces = new int[2][] { new int[] { 8, 9, 10, 11 }, new int[] { 2, 3, 4, 5 } };
     private int FromSquareId;
     private int ToSquareId;
 
@@ -91,46 +92,8 @@
 
     private void SelectPromotionPiece(int id)
     {
-        var promotionPiece = ChessBoard.PromotionPiece[Convert.ToInt32(ChessBoard.IsWhiteTurn)];
-        if (ChessBoard.IsWhiteTurn)
-        {
-            if (id == 1)
-            {
-                promotionPiece = 2;
-            }
-            if (id == 2)
-            {
-                promotionPiece = 5;
-            }
-            if (id == 3)
-            {
-                promotionPiece = 4;
-            }
-            if (id == 4)
-            {
-                promotionPiece = 3;
-            }
-        }
-        else
-        {
-            if (id == 1)
-            {
-                promotionPiece = 8;
-            }
-            if (id == 2)
-            {
-                promotionPiece = 11;
-            }
-            if (id == 3)
-            {
-                promotionPiece = 9;
-            }
-            if (id == 4)
-            {
-                promotionPiece = 10;
-            }
-        }
+        var promotionPieceIndex = Convert.ToInt32(ChessBoard.IsWhiteTurn);
         ChessBoard.PromotionModalIsOpen = false;
-        ChessBoard.MovePiece(FromSquareId, ToSquareId, promotionPiece);
+        ChessBoard.MovePiece(FromSquareId, ToSquareId, PromotionPieces[promotionPieceIndex][id]);
     }
 }
