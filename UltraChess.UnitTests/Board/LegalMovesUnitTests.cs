@@ -34,8 +34,8 @@ namespace UltraChess.UnitTests.Board
 
             foreach (var move in expectedMoves)
             {
-                sut.LegalMoves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPiece == move.CapturedPiece,
-                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPiece} not found.");
+                sut.LegalMoves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
             }
 
             sut.LegalMoves.Count.ShouldBe(20);
@@ -48,7 +48,7 @@ namespace UltraChess.UnitTests.Board
             var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Act
-            sut.Move(52, 36);
+            sut.MakeMove(52, 36);
             sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
 
             // Assert
@@ -68,23 +68,23 @@ namespace UltraChess.UnitTests.Board
 
             foreach (var move in expectedMoves)
             {
-                sut.LegalMoves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPiece == move.CapturedPiece, 
-                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPiece} not found.");
+                sut.LegalMoves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId, 
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
             }
 
             sut.LegalMoves.Count.ShouldBe(20);
         }
 
         [TestMethod]
-        public void E4E5_LegalMoves_ShouldBeCorrect()
+        public void E4F5_LegalMoves_ShouldBeCorrect()
         {
             // Arrange
             var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Act
-            sut.Move(52, 36);
+            sut.MakeMove(52, 36);
             sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
-            sut.Move(13, 29);
+            sut.MakeMove(13, 29);
             sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
 
             // Assert
@@ -105,12 +105,53 @@ namespace UltraChess.UnitTests.Board
                 new Move(60, 52) // E1 king
             };
 
-            var ePawnMoves = sut.LegalMoves.Where(m => m.FromSquareId == 36);
+            foreach (var move in expectedMoves)
+            {
+                sut.LegalMoves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
+            }
+
+            sut.LegalMoves.Count.ShouldBe(31);
+        }
+
+        [TestMethod]
+        public void E4F5F5E5_LegalMoves_ShouldBeCorrect()
+        {
+            // Arrange
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+            // Act
+            sut.MakeMove(52, 36);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.MakeMove(13, 29);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.MakeMove(36, 29);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.MakeMove(12, 28);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+
+            // Assert
+            var expectedMoves = new List<Move>
+            {
+                new Move(48, 40), new Move(48, 32), // A file pawn
+                new Move(49, 41), new Move(49, 33), // B file pawn
+                new Move(50, 42), new Move(50, 34), // C file pawn
+                new Move(51, 43), new Move(51, 35), // D file pawn
+                new Move(53, 45), new Move(53, 37), // F file pawn
+                new Move(29, 21), new Move(29, 20, 7), // F file pawn2
+                new Move(54, 46), new Move(54, 38), // G file pawn
+                new Move(55, 47), new Move(55, 39), // H file pawn
+                new Move(57, 40), new Move(57, 42), // B1 horse
+                new Move(62, 45), new Move(62, 47), new Move(62, 52), // G1 horse
+                new Move(59, 52), new Move(59, 45), new Move(59, 38), new Move(59, 31), // D1 queen
+                new Move(61, 52), new Move(61, 43), new Move(61, 34), new Move(61, 25), new Move(61, 16), // F1 bishop
+                new Move(60, 52) // E1 king
+            };
 
             foreach (var move in expectedMoves)
             {
-                sut.LegalMoves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPiece == move.CapturedPiece,
-                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPiece} not found.");
+                sut.LegalMoves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
             }
 
             sut.LegalMoves.Count.ShouldBe(31);

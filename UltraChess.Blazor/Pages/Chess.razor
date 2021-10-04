@@ -70,9 +70,14 @@
     void Drop(int toSquareId)
     {
         ToSquareId = toSquareId;
-        var fromSquare = ChessBoard.Squares[FromSquareId];
-        ChessBoard.Move(FromSquareId, toSquareId);
-        ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn);
+        if(ChessBoard.LegalMoves.Any(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId))
+        {
+            var moveMade = ChessBoard.MakeMove(FromSquareId, toSquareId);
+            if (moveMade != null)
+            {
+                ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn);
+            }
+        }
     }
 
     void ToggleAutoPromote()

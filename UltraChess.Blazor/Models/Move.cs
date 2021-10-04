@@ -8,15 +8,17 @@
             ToSquareId = toSquareId;
         }
 
-        public Move(int fromSquareId, int toSquareId, int capturedPiece)
+        public Move(int fromSquareId, int toSquareId, int capturedPieceId)
         {
             FromSquareId = fromSquareId;
             ToSquareId = toSquareId;
-            CapturedPiece = capturedPiece;
+            CapturedPieceId = capturedPieceId;
         }
 
         public int FromSquareId { get; set; }
         public int ToSquareId { get; set; }
-        public int CapturedPiece { get; set; }
+        public int CapturedPieceId { get; set; }
+        public MoveFlag Flag { get; set; }
+
     }
 }
