@@ -16,7 +16,7 @@ namespace UltraChess.UnitTests
             {
                 if(square.PieceId != 0)
                 {
-                    var moves = chessBoard.GetMovementSquares(square.Id);
+                    var moves = chessBoard.GetMovesFromSquare(square.Id, chessBoard.IsWhiteTurn);
                     possibleMoves += moves.Count;
                 }
             }

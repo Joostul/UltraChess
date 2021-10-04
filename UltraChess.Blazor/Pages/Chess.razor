@@ -63,8 +63,8 @@
     void StartDrag(int fromSquareId)
     {
         FromSquareId = fromSquareId;
-        var fromSquare = ChessBoard.Squares[FromSquareId];
-        ChessBoard.HighlightLegalMoves(fromSquareId);
+        var moves = ChessBoard.LegalMoves.Where(m => m.FromSquareId == FromSquareId);
+        ChessBoard.HighlightMoves(moves);
     }
 
     void Drop(int toSquareId)
@@ -72,6 +72,7 @@
         ToSquareId = toSquareId;
         var fromSquare = ChessBoard.Squares[FromSquareId];
         ChessBoard.Move(FromSquareId, toSquareId);
+        ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn);
     }
 
     void ToggleAutoPromote()
@@ -94,6 +95,6 @@
     {
         var promotionPieceIndex = Convert.ToInt32(ChessBoard.IsWhiteTurn);
         ChessBoard.PromotionModalIsOpen = false;
-        ChessBoard.MovePiece(FromSquareId, ToSquareId, PromotionPieces[promotionPieceIndex][id]);
+        ChessBoard.MovePiece(new Move(FromSquareId, ToSquareId), PromotionPieces[promotionPieceIndex][id]);
     }
 }

@@ -36,6 +36,7 @@ namespace UltraChess.Blazor.Models
         public int EnPassantSquare = 64;
         public bool PromotionModalIsOpen;
         public bool AutoPromoteQueen = true;
+        public List<Move> LegalMoves;
 
         public ChessBoard(string FEN)
         {
@@ -148,27 +149,21 @@ namespace UltraChess.Blazor.Models
                     Squares[square.Id] = square;
                 }
             }
+
+            LegalMoves = GenerateLegalMoves(IsWhiteTurn);
         }
 
-        public void Move(int fromSquareId, int toSquareId)
+        public Move Move(int fromSquareId, int toSquareId)
         {
+            Move moveMade = null;
+            Squares = Squares.Select(s => { s.IsHighlighted = false; return s; }).ToArray();
             var oldEnPassantSquare = EnPassantSquare;
-            var legalSquaresToMoveTo = GetMovementSquares(fromSquareId, true);
             var pieceToMove = GetPiece(fromSquareId);
-            if (legalSquaresToMoveTo.Count < 1)
-            {
-                return;
-            }
-
-            foreach (var square in legalSquaresToMoveTo)
-            {
-                Squares[square].IsHighlighted = false;
-            }
 
             // If we are moving to the same square
             if (fromSquareId == toSquareId)
             {
-                return;
+                return moveMade;
             }
 
             // Check for en passant
@@ -179,60 +174,112 @@ namespace UltraChess.Blazor.Models
                     // If it's not a normal pawn step
                     if (toSquareId != fromSquareId + DirectionOffsets[0] || toSquareId != fromSquareId + DirectionOffsets[1])
                     {
+                        var enemyPieceId = Squares[toSquareId + DirectionOffsets[Convert.ToInt32(IsWhiteTurn)]].PieceId;
                         // Move the pawn to the en passant square
                         Squares[toSquareId].PieceId = Squares[fromSquareId].PieceId;
                         Squares[fromSquareId].PieceId = 0;
                         // Remove the piece that was en passanted
                         Squares[toSquareId + DirectionOffsets[Convert.ToInt32(IsWhiteTurn)]].PieceId = 0;
                         IsWhiteTurn = !IsWhiteTurn;
-                        return;
+                        moveMade = new Move(fromSquareId, toSquareId, enemyPieceId);
                     }
                 }
             }
 
-            if (legalSquaresToMoveTo.Contains(toSquareId))
+            // Check for pawn promotion
+            var promotionRank = pieceToMove.IsWhite ? '8' : '1';
+            if (pieceToMove is Pawn && Squares[toSquareId].Rank == promotionRank)
             {
-                var piece = GetPiece(fromSquareId);
-                var promotionRank = piece.IsWhite ? '8' : '1';
-                // Check for pawn promotion
-                if (piece is Pawn && Squares[toSquareId].Rank == promotionRank)
+                if (!AutoPromoteQueen)
                 {
-                    if (!AutoPromoteQueen)
-                    {
-                        // Open modal
-                        PromotionModalIsOpen = true;
-                    }
-                    else
-                    {
-                        MovePiece(fromSquareId, toSquareId, PromotionPiece[Convert.ToInt32(piece.IsWhite)]);
-                    }
+                    // Open modal
+                    PromotionModalIsOpen = true;
                 }
                 else
                 {
-                    MovePiece(fromSquareId, toSquareId);
+                    moveMade = MovePiece(new Move(fromSquareId, toSquareId), PromotionPiece[Convert.ToInt32(pieceToMove.IsWhite)]);
                 }
             }
+            else
+            {
+                moveMade = MovePiece(new Move(fromSquareId, toSquareId));
+            }
+
             if (EnPassantSquare == oldEnPassantSquare)
             {
                 EnPassantSquare = 64;
             }
+
+            return moveMade;
         }
 
-        public void MovePiece(int fromSquareId, int toSquareId, int promotionPiece = 0)
+        public void UnMakeMove(Move move)
         {
-            if (Squares[toSquareId].PieceId == 0 || SquareContainsEnemyPiece(GetPiece(fromSquareId).IsWhite, toSquareId))
+            // Move the piece back
+            MovePiece(new Move(move.ToSquareId, move.FromSquareId));
+
+            if(move.CapturedPiece!= 0)
             {
-                Squares[toSquareId].PieceId = promotionPiece == 0 ? Squares[fromSquareId].PieceId : promotionPiece;
-                Squares[fromSquareId].PieceId = 0;
-                IsWhiteTurn = !IsWhiteTurn;
+                Squares[move.ToSquareId].PieceId = move.CapturedPiece;
             }
         }
 
-        public List<int> GetMovementSquares(int fromSquareId, bool setEnPassantSquare = false)
+        public Move MovePiece(Move move, int promotionPiece = 0)
         {
-            var moves = new List<int>();
+            var squareContainsEnemyPiece = SquareContainsEnemyPiece(GetPiece(move.FromSquareId).IsWhite, move.ToSquareId);
+            if (Squares[move.ToSquareId].PieceId == 0 || squareContainsEnemyPiece)
+            {
+                var enemyPieceId = squareContainsEnemyPiece ? Squares[move.ToSquareId].PieceId : 0;
+                Squares[move.ToSquareId].PieceId = promotionPiece == 0 ? Squares[move.FromSquareId].PieceId : promotionPiece;
+                Squares[move.FromSquareId].PieceId = 0;
+                IsWhiteTurn = !IsWhiteTurn;
+                return new Move(move.FromSquareId, move.ToSquareId, enemyPieceId);
+            }
+            return null;
+        }
+
+        public List<Move> GenerateMoves(bool isWhite)
+        {
+            var moves = new List<Move>();
+
+            foreach (var square in Squares)
+            {
+                if (SquareContainsPiece(square.Id))
+                {
+                    moves.AddRange(GetMovesFromSquare(square.Id, isWhite));
+                }
+            }
+            return moves;
+        }
+
+        public List<Move> GenerateLegalMoves(bool isWhite)
+        {
+            // En passant not hightlighted
+            // Capturing piece is removed after en passant
+            var yourPieceKingId = IsWhiteTurn ? 6 : 11;
+            var yourKingSquare = Squares.Single(s => s.PieceId == yourPieceKingId);
+            var pseudoLegalMoves = GenerateMoves(isWhite);
+            var legalMoves = new List<Move>();
+
+            foreach (var move in pseudoLegalMoves)
+            {
+                var moveMade = Move(move.FromSquareId, move.ToSquareId);
+                var opponentResponses = GenerateMoves(!isWhite);
+                if (!opponentResponses.Any(r => r.ToSquareId == yourKingSquare.Id))
+                {
+                    legalMoves.Add(move);
+                }
+                UnMakeMove(moveMade);
+            }
+
+            return legalMoves;
+        }
+
+        public List<Move> GetMovesFromSquare(int fromSquareId, bool isWhite, bool setEnPassantSquare = false)
+        {
+            var moves = new List<Move>();
             var piece = GetPiece(fromSquareId);
-            if (piece.IsWhite != IsWhiteTurn)
+            if (piece.IsWhite != isWhite)
             {
                 return moves;
             }
@@ -269,13 +316,13 @@ namespace UltraChess.Blazor.Models
                 moves.AddRange(GenerateKnightMoves(fromSquareId));
             }
 
-            return GetValidSquares(moves);
+            return RemoveSquaresOutsideBoard(moves);
         }
 
-        List<int> GeneratePawnMoves(int fromSquareId, int direction, int startDirectionIndex, int endDirectionIndex, bool isWhite, bool setEnPassantSquare)
+        List<Move> GeneratePawnMoves(int fromSquareId, int direction, int startDirectionIndex, int endDirectionIndex, bool isWhite, bool setEnPassantSquare)
         {
             var piece = GetPiece(fromSquareId);
-            var moves = new List<int>();
+            var moves = new List<Move>();
             int rankStartSquareIndex;
             int rankEndSquareIndex;
 
@@ -294,7 +341,7 @@ namespace UltraChess.Blazor.Models
             var toSquareId = fromSquareId + DirectionOffsets[direction];
             if (!SquareContainsPiece(toSquareId))
             {
-                moves.Add(toSquareId);
+                moves.Add(new Move(fromSquareId, toSquareId));
             }
 
             // Or two from the starting rank
@@ -303,7 +350,7 @@ namespace UltraChess.Blazor.Models
             {
                 if (!SquareContainsPiece(toSquareId))
                 {
-                    moves.Add(toSquareId);
+                    moves.Add(new Move(fromSquareId, toSquareId));
                     if (setEnPassantSquare)
                     {
                         EnPassantSquare = fromSquareId + DirectionOffsets[direction];
@@ -315,7 +362,7 @@ namespace UltraChess.Blazor.Models
             var diagonalCaptures = GenerateSlidingMoves(fromSquareId, startDirectionIndex, endDirectionIndex, 1);
             foreach (var diagonalCapture in diagonalCaptures)
             {
-                if (SquareContainsEnemyPiece(piece.IsWhite, diagonalCapture) || EnPassantSquare == diagonalCapture)
+                if (SquareContainsEnemyPiece(piece.IsWhite, diagonalCapture.ToSquareId) || EnPassantSquare == diagonalCapture.ToSquareId)
                 {
                     moves.Add(diagonalCapture);
                 }
@@ -324,33 +371,33 @@ namespace UltraChess.Blazor.Models
             return moves;
         }
 
-        List<int> GenerateKnightMoves(int fromSquareId)
+        List<Move> GenerateKnightMoves(int fromSquareId)
         {
-            var moves = new List<int>();
+            var moves = new List<Move>();
 
-            foreach (var squareId in KnightMoves[fromSquareId])
+            foreach (var toSquareId in KnightMoves[fromSquareId])
             {
                 // If a piece is already there
-                if (SquareContainsPiece(squareId))
+                if (SquareContainsPiece(toSquareId))
                 {
                     // If it's not your own piece
-                    if (GetPiece(squareId).IsWhite != GetPiece(fromSquareId).IsWhite)
+                    if (GetPiece(toSquareId).IsWhite != GetPiece(fromSquareId).IsWhite)
                     {
-                        moves.Add(squareId);
+                        moves.Add(new Move(fromSquareId, toSquareId));
                     }
                 }
                 else
                 {
-                    moves.Add(squareId);
+                    moves.Add(new Move(fromSquareId, toSquareId));
                 }
             }
 
             return moves;
         }
 
-        List<int> GenerateSlidingMoves(int fromSquareId, int startDirectionIndex, int endDirectionIndex, int maxSquaresToMove = 7)
+        List<Move> GenerateSlidingMoves(int fromSquareId, int startDirectionIndex, int endDirectionIndex, int maxSquaresToMove = 7)
         {
-            var moves = new List<int>();
+            var moves = new List<Move>();
 
             // For each direction
             for (int directionIndex = startDirectionIndex; directionIndex < endDirectionIndex; directionIndex++)
@@ -366,7 +413,7 @@ namespace UltraChess.Blazor.Models
                         // If a piece is not blocking
                         if (Squares[toSquareId].PieceId == 0)
                         {
-                            moves.Add(toSquareId);
+                            moves.Add(new Move(fromSquareId, toSquareId));
                         }
                         else
                         {
@@ -374,7 +421,7 @@ namespace UltraChess.Blazor.Models
                             if (GetPiece(toSquareId).IsWhite != GetPiece(fromSquareId).IsWhite)
                             {
                                 // Able to capture
-                                moves.Add(toSquareId);
+                                moves.Add(new Move(fromSquareId, toSquareId, Squares[toSquareId].PieceId));
                             }
                             break;
                         }
@@ -389,24 +436,22 @@ namespace UltraChess.Blazor.Models
             return moves;
         }
 
-        public void HighlightLegalMoves(int fromSquareId)
+        public void HighlightMoves(IEnumerable<Move> moves)
         {
-            var legalSquaresToMoveTo = GetMovementSquares(fromSquareId);
-
-            foreach (var legalSquareToMoveTo in legalSquaresToMoveTo)
+            foreach (var move in moves)
             {
-                Squares[legalSquareToMoveTo].IsHighlighted = true;
+                Squares[move.ToSquareId].IsHighlighted = true;
             }
         }
 
-        private static List<int> GetValidSquares(List<int> squares)
+        private static List<Move> RemoveSquaresOutsideBoard(List<Move> squares)
         {
-            return squares.Where(s => s < 64 && s >= 0).Distinct().ToList();
+            return squares.Where(s => s.ToSquareId < 64 && s.ToSquareId >= 0).Distinct().ToList();
         }
 
-        private bool SquareContainsPiece(int toSquareId)
+        private bool SquareContainsPiece(int squareId)
         {
-            return Squares[toSquareId].PieceId != 0;
+            return Squares[squareId].PieceId != 0;
         }
 
         private bool SquareContainsEnemyPiece(bool pieceIsWhite, int toSquareId)
