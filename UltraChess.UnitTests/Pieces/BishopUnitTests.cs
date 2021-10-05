@@ -15,10 +15,10 @@ namespace UltraChess.UnitTests.Pieces
             var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Act
-            var moves = sut.GetMovementSquares(2);
+            var moves = sut.GetMovesFromSquare(2, sut.IsWhiteTurn);
 
             // Assert
-            moves.ShouldBe(new List<int> {  });
+            moves.ShouldBe(new List<Move> { });
         }
 
         [TestMethod]
@@ -28,26 +28,38 @@ namespace UltraChess.UnitTests.Pieces
             var sut = new ChessBoard("rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2");
 
             // Act
-            var moves = sut.GetMovementSquares(5);
+            var moves = sut.GetMovesFromSquare(5, sut.IsWhiteTurn);
 
             // Assert
-            moves.ShouldBe(new List<int> { 12, 19, 26, 33, 40 });
+            var expectedMoves = new List<Move> { new Move(5, 12), new Move(5, 19), new Move(5, 26), new Move(5, 33), new Move(5, 40) };
+            foreach (var move in expectedMoves)
+            {
+                moves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
+            }
+            moves.Count.ShouldBe(5);
         }
 
         [TestMethod]
         public void GetSlidingMovesTest_OnlyBishopOnBoard_SquareIndex0()
         {
             // Arrange
-            var sut = new ChessBoard("b7/8/8/8/8/8/8/8 w KQkq - 0 1")
+            var sut = new ChessBoard("b1K1k4/8/8/8/8/8/8/8 w KQkq - 0 1")
             {
                 IsWhiteTurn = false
             };
 
             // Act
-            var moves = sut.GetMovementSquares(0);
+            var moves = sut.GetMovesFromSquare(0, sut.IsWhiteTurn);
 
             // Assert
-            moves.ShouldBe(new List<int> { 9, 18, 27, 36, 45, 54, 63 });
+            var expectedMoves = new List<Move> { new Move(0, 9), new Move(0, 18), new Move(0, 27), new Move(0, 36), new Move(0, 45), new Move(0, 54), new Move(0, 63) };
+            foreach (var move in expectedMoves)
+            {
+                moves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
+            }
+            moves.Count.ShouldBe(7);
         }
     }
 }

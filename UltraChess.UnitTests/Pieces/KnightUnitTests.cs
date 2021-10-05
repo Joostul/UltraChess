@@ -18,10 +18,16 @@ namespace UltraChess.UnitTests.Pieces
             };
 
             // Act
-            var moves = sut.GetMovementSquares(1);
+            var moves = sut.GetMovesFromSquare(1, sut.IsWhiteTurn);
 
             // Assert
-            moves.ShouldBe(new List<int> { 16, 18 });
+            var expectedMoves = new List<Move> { new Move(1, 16), new Move(1, 18) };
+            foreach (var move in expectedMoves)
+            {
+                moves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
+            }
+            moves.Count.ShouldBe(2);
         }
 
         [TestMethod]
@@ -31,10 +37,16 @@ namespace UltraChess.UnitTests.Pieces
             var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Act
-            var moves = sut.GetMovementSquares(57);
+            var moves = sut.GetMovesFromSquare(57, sut.IsWhiteTurn);
 
             // Assert
-            moves.ShouldBe(new List<int> { 40, 42 });
+            var expectedMoves = new List<Move> { new Move(57, 40), new Move(57, 42) };
+            foreach (var move in expectedMoves)
+            {
+                moves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
+            }
+            moves.Count.ShouldBe(2);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace UltraChess.UnitTests.Board
         public void GetNumberOfSquaresToEdge_SquareIndex3()
         {
             // Arrange / Act
-            var sut = new ChessBoard("8/8/8/8/8/8/8/8 w KQkq - 0 1");
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Assert
             sut.NumberOfSquaresToEdge[3][0].ShouldBe(0); // North
@@ -45,7 +45,7 @@ namespace UltraChess.UnitTests.Board
         public void GetNumberOfSquaresToEdge_SquareIndex5()
         {
             // Arrange / Act
-            var sut = new ChessBoard("8/8/8/8/8/8/8/8 w KQkq - 0 1");
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Assert
             sut.NumberOfSquaresToEdge[5][0].ShouldBe(0); // North
@@ -62,7 +62,7 @@ namespace UltraChess.UnitTests.Board
         public void GetNumberOfSquaresToEdge_SquareIndex8()
         {
             // Arrange / Act
-            var sut = new ChessBoard("8/8/8/8/8/8/8/8 w KQkq - 0 1");
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Assert
             sut.NumberOfSquaresToEdge[8][0].ShouldBe(1); // North
@@ -79,7 +79,7 @@ namespace UltraChess.UnitTests.Board
         public void GetNumberOfSquaresToEdge_SquareIndex16()
         {
             // Arrange / Act
-            var sut = new ChessBoard("8/8/8/8/8/8/8/8 w KQkq - 0 1");
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Assert
             sut.NumberOfSquaresToEdge[16][0].ShouldBe(2); // North
@@ -96,7 +96,7 @@ namespace UltraChess.UnitTests.Board
         public void GetNumberOfSquaresToEdge_SquareIndex28()
         {
             // Arrange / Act
-            var sut = new ChessBoard("8/8/8/8/8/8/8/8 w KQkq - 0 1");
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Assert
             sut.NumberOfSquaresToEdge[28][0].ShouldBe(3); // North
@@ -113,7 +113,7 @@ namespace UltraChess.UnitTests.Board
         public void GetNumberOfSquaresToEdge_SquareIndex60()
         {
             // Arrange / Act
-            var sut = new ChessBoard("8/8/8/8/8/8/8/8 w KQkq - 0 1");
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Assert
             sut.NumberOfSquaresToEdge[60][0].ShouldBe(7); // North
@@ -130,7 +130,7 @@ namespace UltraChess.UnitTests.Board
         public void GetNumberOfSquaresToEdge_SquareIndex63()
         {
             // Arrange / Act
-            var sut = new ChessBoard("8/8/8/8/8/8/8/8 w KQkq - 0 1");
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Assert
             sut.NumberOfSquaresToEdge[63][0].ShouldBe(7); // North
@@ -141,6 +141,27 @@ namespace UltraChess.UnitTests.Board
             sut.NumberOfSquaresToEdge[63][5].ShouldBe(0); // NorthEast
             sut.NumberOfSquaresToEdge[63][6].ShouldBe(0); // SouthEast
             sut.NumberOfSquaresToEdge[63][7].ShouldBe(0); // SouthWest
+        }
+
+        [TestMethod]
+        public void UnMakeMove_EnPassant_Correct()
+        {
+            // Arrange
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+            // Act
+            sut.MakeMove(52, 36);
+            sut.MakeMove(8, 16);
+            sut.MakeMove(36, 28);
+            sut.MakeMove(11, 27);
+            var move = sut.MakeMove(28, 19);
+            sut.UnMakeMove(move);
+            var legalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+
+            // Assert
+            sut.EnPassantSquare.ShouldBe(19);
+            legalMoves.ShouldContain(m => m.FromSquareId == 28 && m.ToSquareId == 19 && m.Flag == MoveFlag.EnPassant && m.CapturedPieceId == 7,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
         }
 
     }
