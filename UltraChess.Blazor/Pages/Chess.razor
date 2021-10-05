@@ -8,6 +8,11 @@
     <label class="form-check-label" for="autopromotequeen">Automatically promote to a queen.</label>
 </div>
 
+<div>
+    <button @onclick="() => { ChessBoard.UnMakeMove(ChessBoard.MovesMade.Peek()); ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn); }" class="btn btn-primary mb-3"> <span class="btn-label"><span class="oi oi-arrow-left" title="unmake move" aria-hidden="true"></span></span></button>
+
+</div>
+
 <div class="@modalClass" tabindex="-1" style="display: @displayMode;">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
@@ -64,11 +69,12 @@
     {
         FromSquareId = fromSquareId;
         var moves = ChessBoard.LegalMoves.Where(m => m.FromSquareId == FromSquareId);
-        ChessBoard.HighlightMoves(moves);
+        ChessBoard.HighlightMoves(moves, true);
     }
 
     void Drop(int toSquareId)
     {
+        ChessBoard.HighlightMoves(ChessBoard.LegalMoves, false);
         ToSquareId = toSquareId;
         if(ChessBoard.LegalMoves.Any(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId))
         {

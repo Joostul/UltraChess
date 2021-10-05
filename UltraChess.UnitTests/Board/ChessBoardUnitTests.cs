@@ -143,5 +143,26 @@ namespace UltraChess.UnitTests.Board
             sut.NumberOfSquaresToEdge[63][7].ShouldBe(0); // SouthWest
         }
 
+        [TestMethod]
+        public void UnMakeMove_EnPassant_Correct()
+        {
+            // Arrange
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+            // Act
+            sut.MakeMove(52, 36);
+            sut.MakeMove(8, 16);
+            sut.MakeMove(36, 28);
+            sut.MakeMove(11, 27);
+            var move = sut.MakeMove(28, 19);
+            sut.UnMakeMove(move);
+            var legalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+
+            // Assert
+            sut.EnPassantSquare.ShouldBe(19);
+            legalMoves.ShouldContain(m => m.FromSquareId == 28 && m.ToSquareId == 19 && m.Flag == MoveFlag.EnPassant && m.CapturedPieceId == 7,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
+        }
+
     }
 }
