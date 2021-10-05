@@ -274,7 +274,7 @@ namespace UltraChess.Blazor.Models
                 Squares[move.ToSquareId].PieceId = promotionPiece == 0 ? Squares[move.FromSquareId].PieceId : promotionPiece;
                 Squares[move.FromSquareId].PieceId = 0;
                 IsWhiteTurn = !IsWhiteTurn;
-                return new Move(move.FromSquareId, move.ToSquareId, enemyPieceId);
+                return new Move(move.FromSquareId, move.ToSquareId, enemyPieceId) { Flag = promotionPiece == 0 ? MoveFlag.PawnPromotion : MoveFlag.None };
             }
             return null;
         }
