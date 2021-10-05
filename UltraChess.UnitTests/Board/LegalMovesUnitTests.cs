@@ -2,7 +2,6 @@
 using Shouldly;
 using System.Collections.Generic;
 using UltraChess.Blazor.Models;
-using System.Linq;
 
 namespace UltraChess.UnitTests.Board
 {
@@ -156,6 +155,5 @@ namespace UltraChess.UnitTests.Board
 
             sut.LegalMoves.Count.ShouldBe(31);
         }
-
     }
 }
