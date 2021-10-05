@@ -224,6 +224,10 @@ namespace UltraChess.Blazor.Models
                         EnPassantSquare = moveMade.ToSquareId - 8;
                     }
                 }
+                else
+                {
+                    EnPassantSquare = 64;
+                }
             }
             else
             {
@@ -292,8 +296,7 @@ namespace UltraChess.Blazor.Models
 
         public List<Move> GenerateLegalMoves(bool isWhite)
         {
-            var yourPieceKingId = IsWhiteTurn ? 6 : 11;
-            var yourKingSquare = Squares.Single(s => s.PieceId == yourPieceKingId);
+            var yourPieceKingId = IsWhiteTurn ? 6 : 12;
             var pseudoLegalMoves = GenerateMoves(isWhite);
             var legalMoves = new List<Move>();
 
@@ -303,7 +306,7 @@ namespace UltraChess.Blazor.Models
                 if (moveMade != null)
                 {
                     var opponentResponses = GenerateMoves(!isWhite);
-                    if (!opponentResponses.Any(r => r.ToSquareId == yourKingSquare.Id))
+                    if (!opponentResponses.Exists(r => r.CapturedPieceId == yourPieceKingId))
                     {
                         legalMoves.Add(move);
                     }
