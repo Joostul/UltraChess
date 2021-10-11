@@ -10,7 +10,6 @@
 
 <div>
     <button @onclick="() => { ChessBoard.UnMakeMove(ChessBoard.MovesMade.Peek()); ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn); }" class="btn btn-primary mb-3"> <span class="btn-label"><span class="oi oi-arrow-left" title="unmake move" aria-hidden="true"></span></span></button>
-
 </div>
 
 <div class="@modalClass" tabindex="-1" style="display: @displayMode;">
@@ -76,10 +75,11 @@
     {
         ChessBoard.HighlightMoves(ChessBoard.LegalMoves, false);
         ToSquareId = toSquareId;
-        if(ChessBoard.LegalMoves.Any(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId))
+        var moveToMake = ChessBoard.LegalMoves.FirstOrDefault(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId);
+        if (moveToMake != null)
         {
-            var moveMade = ChessBoard.MakeMove(FromSquareId, toSquareId);
-            if (moveMade != null)
+            var moveMade = ChessBoard.MakeMove(moveToMake);
+            if (moveMade)
             {
                 ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn);
             }
@@ -106,6 +106,5 @@
     {
         var promotionPieceIndex = Convert.ToInt32(ChessBoard.IsWhiteTurn);
         ChessBoard.PromotionModalIsOpen = false;
-        ChessBoard.MovePiece(new Move(FromSquareId, ToSquareId), PromotionPieces[promotionPieceIndex][id]);
     }
 }

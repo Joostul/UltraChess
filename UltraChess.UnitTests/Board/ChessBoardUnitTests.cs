@@ -150,18 +150,41 @@ namespace UltraChess.UnitTests.Board
             var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Act
-            sut.MakeMove(52, 36);
-            sut.MakeMove(8, 16);
-            sut.MakeMove(36, 28);
-            sut.MakeMove(11, 27);
-            var move = sut.MakeMove(28, 19);
-            sut.UnMakeMove(move);
+            sut.MakeMove(new Move(52, 36));
+            sut.MakeMove(new Move(8, 16));
+            sut.MakeMove(new Move(36, 28));
+            sut.MakeMove(new Move(11, 27) { Flag = MoveFlag.PawnTwoForward });
+            var enPassantMove = new Move(28, 19, 7) { Flag = MoveFlag.EnPassant };
+            sut.MakeMove(enPassantMove);
+            sut.UnMakeMove(enPassantMove);
             var legalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
 
             // Assert
             sut.EnPassantSquare.ShouldBe(19);
             legalMoves.ShouldContain(m => m.FromSquareId == 28 && m.ToSquareId == 19 && m.Flag == MoveFlag.EnPassant && m.CapturedPieceId == 7,
-                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
+                    $"Move from: {enPassantMove.FromSquareId} to: {enPassantMove.ToSquareId}, capturing: {enPassantMove.CapturedPieceId} not found.");
+        }
+
+        [TestMethod]
+        public void MakeMove_Promotion_Correct()
+        {
+            // Arrange
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+            // Act
+            sut.MakeMove(new Move(52, 36));
+            sut.MakeMove(new Move(13, 29));
+            sut.MakeMove(new Move(36, 29, 7));
+            sut.MakeMove(new Move(14, 22));
+            sut.MakeMove(new Move(29, 22, 7));
+            sut.MakeMove(new Move(19, 27));
+            sut.MakeMove(new Move(22, 15, 7));
+            sut.MakeMove(new Move(27, 35));
+            sut.MakeMove(new Move(15, 6, 8) { Flag = MoveFlag.PawnPromotion });
+
+            // Assert
+            sut.Squares[6].PieceId.ShouldBe(5);
+            sut.Squares[15].PieceId.ShouldBe(0);
         }
 
     }

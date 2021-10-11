@@ -24,9 +24,9 @@ namespace UltraChess.UnitTests.UnitTestTools
 
             foreach (var move in moves)
             {
-                var moveMade = ChessBoard.MakeMove(move.FromSquareId, move.ToSquareId);
+                ChessBoard.MakeMove(move);
                 numberOfPosiitions += GenerateMoves(depth - 1);
-                ChessBoard.UnMakeMove(moveMade);
+                ChessBoard.UnMakeMove(move);
             }
 
             return numberOfPosiitions;
