@@ -165,5 +165,27 @@ namespace UltraChess.UnitTests.Board
                     $"Move from: {enPassantMove.FromSquareId} to: {enPassantMove.ToSquareId}, capturing: {enPassantMove.CapturedPieceId} not found.");
         }
 
+        [TestMethod]
+        public void MakeMove_Promotion_Correct()
+        {
+            // Arrange
+            var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+            // Act
+            sut.MakeMove(new Move(52, 36));
+            sut.MakeMove(new Move(13, 29));
+            sut.MakeMove(new Move(36, 29, 7));
+            sut.MakeMove(new Move(14, 22));
+            sut.MakeMove(new Move(29, 22, 7));
+            sut.MakeMove(new Move(19, 27));
+            sut.MakeMove(new Move(22, 15, 7));
+            sut.MakeMove(new Move(27, 35));
+            sut.MakeMove(new Move(15, 6, 8) { Flag = MoveFlag.PawnPromotion });
+
+            // Assert
+            sut.Squares[6].PieceId.ShouldBe(5);
+            sut.Squares[15].PieceId.ShouldBe(0);
+        }
+
     }
 }
