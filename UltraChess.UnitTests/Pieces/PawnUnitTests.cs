@@ -41,8 +41,8 @@ namespace UltraChess.UnitTests.Pieces
         {
             // Arrange
             var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-            sut.MakeMove(52, 36);
-            sut.MakeMove(13, 29);
+            sut.MakeMove(new Move(52, 36));
+            sut.MakeMove(new Move(13, 29));
 
             // Act
             var moves = sut.GetMovesFromSquare(36, sut.IsWhiteTurn);
@@ -62,10 +62,10 @@ namespace UltraChess.UnitTests.Pieces
         {
             // Arrange
             var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-            sut.MakeMove(52, 36);
-            sut.MakeMove(8, 16);
-            sut.MakeMove(36, 28);
-            sut.MakeMove(11, 27);
+            sut.MakeMove(new Move(52, 36));
+            sut.MakeMove(new Move(8, 16));
+            sut.MakeMove(new Move(36, 28));
+            sut.MakeMove(new Move(11, 27) { Flag = MoveFlag.PawnTwoForward });
 
             // Act
             var moves = sut.GetMovesFromSquare(28, sut.IsWhiteTurn);
