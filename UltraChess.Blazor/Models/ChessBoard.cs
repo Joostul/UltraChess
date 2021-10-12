@@ -7,6 +7,7 @@ namespace UltraChess.Blazor.Models
 {
     public class ChessBoard
     {
+        // Positional properties
         readonly char[] characters = "abcdefgh".ToCharArray();
         readonly char[] numbers = "87654321".ToCharArray();
         public readonly int[] DirectionOffsets = { -8, 8, 1, -1, -9, -7, 9, 7 };
@@ -33,17 +34,24 @@ namespace UltraChess.Blazor.Models
             new King { IsWhite = false, Image = "img/K_B.png" },
         };
         public bool IsWhiteTurn;
-        public int EnPassantSquare = 64;
-        public int OldEnPassantSquare = 64;
-        public bool PromotionModalIsOpen;
-        public bool AutoPromoteQueen = true;
+        public int EnPassantSquareId = 64;
+        public int OldEnPassantSquareId = 64;
         public List<Move> LegalMoves;
         public Stack<Move> MovesMade = new();
 
+        // Settings
+        public bool AutoPromoteQueen = true;
+
+        // 
+        public bool PromotionModalIsOpen;
+
         public ChessBoard(string FEN)
         {
-            IsWhiteTurn = FEN.Split(' ')[1][0] == 'w';
-            var boardFENCharacters = FENUtility.ParseFENString(FEN);
+            var boardPositionInfo = FENUtility.GetBoardPositionInfo(FEN);
+            IsWhiteTurn = boardPositionInfo.IsWhiteTurn;
+            var hasEnpassantSquare = boardPositionInfo.EnPassantSquare != "-";
+            EnPassantSquareId = hasEnpassantSquare ? Squares.SingleOrDefault(s => s.Rank == boardPositionInfo.EnPassantSquare[1] && s.File == boardPositionInfo.EnPassantSquare[0]).Id : 64;
+
             for (int file = 0; file < 8; file++)
             {
                 for (int rank = 0; rank < 8; rank++)
@@ -98,7 +106,7 @@ namespace UltraChess.Blazor.Models
                         File = characters[rank],
                         IsLight = (file + rank) % 2 == 0
                     };
-                    var fenCharacter = boardFENCharacters[squareIndex];
+                    var fenCharacter = boardPositionInfo.Board[squareIndex];
                     if (fenCharacter == 'P')
                     {
                         square.PieceId = 1;
@@ -157,7 +165,7 @@ namespace UltraChess.Blazor.Models
 
         public bool MakeMove(Move move)
         {
-            OldEnPassantSquare = EnPassantSquare;
+            OldEnPassantSquareId = EnPassantSquareId;
             Squares = Squares.Select(s => { s.IsHighlighted = false; return s; }).ToArray();
             var pieceToMove = GetPiece(move.FromSquareId);
             int fromSquareId = move.FromSquareId;
@@ -187,7 +195,7 @@ namespace UltraChess.Blazor.Models
                     case MoveFlag.PawnTwoForward:
                         Squares[toSquareId].PieceId = Squares[fromSquareId].PieceId;
                         Squares[fromSquareId].PieceId = 0;
-                        EnPassantSquare = toSquareId + DirectionOffsets[Convert.ToInt32(IsWhiteTurn)];
+                        EnPassantSquareId = toSquareId + DirectionOffsets[Convert.ToInt32(IsWhiteTurn)];
                         break;
                     case MoveFlag.None:
                     default:
@@ -195,7 +203,7 @@ namespace UltraChess.Blazor.Models
                         Squares[fromSquareId].PieceId = 0;
                         break;
                 }
-                EnPassantSquare = OldEnPassantSquare == EnPassantSquare ? 64 : EnPassantSquare;
+                EnPassantSquareId = OldEnPassantSquareId == EnPassantSquareId ? 64 : EnPassantSquareId;
 
                 MovesMade.Push(move);
                 IsWhiteTurn = !IsWhiteTurn;
@@ -237,7 +245,7 @@ namespace UltraChess.Blazor.Models
             }
 
             // Set en passant square back
-            EnPassantSquare = OldEnPassantSquare;
+            EnPassantSquareId = OldEnPassantSquareId;
 
             // Set back to correct turn
             IsWhiteTurn = !IsWhiteTurn;
@@ -390,7 +398,7 @@ namespace UltraChess.Blazor.Models
                         }
                     }
                 }
-                else if (EnPassantSquare == diagonalCapture.ToSquareId && SquareContainsEnemyPiece(piece.IsWhite, Squares[diagonalCapture.ToSquareId + DirectionOffsets[Convert.ToInt32(IsWhiteTurn)]].Id))
+                else if (EnPassantSquareId == diagonalCapture.ToSquareId && SquareContainsEnemyPiece(piece.IsWhite, Squares[diagonalCapture.ToSquareId + DirectionOffsets[Convert.ToInt32(IsWhiteTurn)]].Id))
                 {
                     var enemyPieceSquare = Squares[diagonalCapture.ToSquareId + DirectionOffsets[Convert.ToInt32(IsWhiteTurn)]].PieceId;
                     diagonalCapture.CapturedPieceId = enemyPieceSquare;
