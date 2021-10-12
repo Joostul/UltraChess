@@ -49,8 +49,6 @@ namespace UltraChess.Blazor.Models
         {
             var boardPositionInfo = FENUtility.GetBoardPositionInfo(FEN);
             IsWhiteTurn = boardPositionInfo.IsWhiteTurn;
-            var hasEnpassantSquare = boardPositionInfo.EnPassantSquare != "-";
-            EnPassantSquareId = hasEnpassantSquare ? Squares.SingleOrDefault(s => s.Rank == boardPositionInfo.EnPassantSquare[1] && s.File == boardPositionInfo.EnPassantSquare[0]).Id : 64;
 
             for (int file = 0; file < 8; file++)
             {
@@ -159,6 +157,9 @@ namespace UltraChess.Blazor.Models
                     Squares[square.Id] = square;
                 }
             }
+
+            var hasEnpassantSquare = boardPositionInfo.EnPassantSquare != "-";
+            EnPassantSquareId = hasEnpassantSquare ? Squares.SingleOrDefault(s => s.Rank == boardPositionInfo.EnPassantSquare[1] && s.File == boardPositionInfo.EnPassantSquare[0]).Id : 64;
 
             LegalMoves = GenerateLegalMoves(IsWhiteTurn);
         }

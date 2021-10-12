@@ -42,7 +42,7 @@ namespace UltraChess.Blazor.Utility
 
             if (FENparts.Length > 3)
             {
-                boardPositionInfo.EnPassantSquare = FENparts[3][0].ToString();
+                boardPositionInfo.EnPassantSquare = FENparts[3];
             }
 
             return boardPositionInfo;
