@@ -79,5 +79,24 @@ namespace UltraChess.UnitTests.Pieces
             }
             moves.Count.ShouldBe(2);
         }
+
+        [TestMethod]
+        public void GetPawnMoves_EnPassant_FromFEN()
+        {
+            // Arrange
+            var sut = new ChessBoard("rnbqkbnr/ppppp2p/6p1/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3");
+
+            // Act
+            var moves = sut.GetMovesFromSquare(28, sut.IsWhiteTurn);
+
+            // Assert
+            var expectedMoves = new List<Move> { new Move(28, 20), new Move(28, 21, 7) };
+            foreach (var move in expectedMoves)
+            {
+                moves.ShouldContain(m => m.ToSquareId == move.ToSquareId && m.FromSquareId == move.FromSquareId && m.CapturedPieceId == move.CapturedPieceId,
+                    $"Move from: {move.FromSquareId} to: {move.ToSquareId}, capturing: {move.CapturedPieceId} not found.");
+            }
+            moves.Count.ShouldBe(2);
+        }
     }
 }
