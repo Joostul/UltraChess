@@ -312,7 +312,7 @@ namespace UltraChess.Blazor.Models
             }
             else if (piece is King)
             {
-                moves.AddRange(GenerateSlidingMoves(fromSquareId, 0, 8, 1));
+                moves.AddRange(GenerateKingMoves(fromSquareId));
             }
             else if (piece is Rook)
             {
@@ -407,6 +407,16 @@ namespace UltraChess.Blazor.Models
                     moves.Add(diagonalCapture);
                 }
             }
+
+            return moves;
+        }
+
+        List<Move> GenerateKingMoves(int fromSquareId)
+        {
+            var moves = GenerateSlidingMoves(fromSquareId, 0, 8, 1);
+
+            // Castling
+
 
             return moves;
         }

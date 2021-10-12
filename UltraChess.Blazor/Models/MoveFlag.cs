@@ -5,6 +5,7 @@
         None = 0,
         PawnTwoForward = 1,
         EnPassant = 2,
-        PawnPromotion = 3
+        PawnPromotion = 3,
+        Castling = 4
     }
 }
