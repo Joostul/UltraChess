@@ -433,7 +433,7 @@ namespace UltraChess.Blazor.Models
                     // If it's not your own piece
                     if (GetPiece(toSquareId).IsWhite != GetPiece(fromSquareId).IsWhite)
                     {
-                        moves.Add(new Move(fromSquareId, toSquareId));
+                        moves.Add(new Move(fromSquareId, toSquareId, Squares[toSquareId].PieceId));
                     }
                 }
                 else
