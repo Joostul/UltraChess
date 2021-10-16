@@ -166,8 +166,7 @@ namespace UltraChess.Blazor.Models
                 }
             }
 
-            var hasEnpassantSquare = boardPositionInfo.EnPassantSquare != "-";
-            EnPassantSquareId = hasEnpassantSquare ? Squares.SingleOrDefault(s => s.Rank == boardPositionInfo.EnPassantSquare[1] && s.File == boardPositionInfo.EnPassantSquare[0]).Id : 64;
+            EnPassantSquareId = boardPositionInfo.EnPassantSquareId;
 
             LegalMoves = GenerateLegalMoves(IsWhiteTurn);
         }
@@ -302,7 +301,7 @@ namespace UltraChess.Blazor.Models
                     Squares[move.ToSquareId].PieceId = 0;
                     break;
                 case MoveFlag.PawnPromotion:
-                    Squares[move.FromSquareId].PieceId = GetPiece(Squares[move.FromSquareId].Id).IsWhite ? 1 : 7;
+                    Squares[move.FromSquareId].PieceId = GetPiece(move.FromSquareId).IsWhite ? 1 : 7;
                     break;
                 case MoveFlag.Castling:
                     if (Squares[move.ToSquareId].PieceId == 6)

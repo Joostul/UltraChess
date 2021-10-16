@@ -7,99 +7,79 @@ namespace UltraChess.UnitTests.Board
     [TestClass]
     public class LegalMovesAmountUnitTests
     {
-
-
         [TestMethod]
-        public void LegalMoves_0ply_ShouldBeCorrect()
+        public void DefaultBoard_WhiteToMove_LegalMoves_ShouldBeCorrect()
         {
             // Arrange
-            var moveGeneratorTestTool = new MoveGenerator();
+            var moveGeneratorTestTool = new MoveGenerator("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ");
 
             // Act
-            var numberOfLegalMoves = moveGeneratorTestTool.GenerateMoves(0);
+            var numberOfLegalMoves0Ply = moveGeneratorTestTool.GenerateMoves(0);
+            var numberOfLegalMoves1Ply = moveGeneratorTestTool.GenerateMoves(1);
+            var numberOfLegalMoves2Ply = moveGeneratorTestTool.GenerateMoves(2);
+            var numberOfLegalMoves3Ply = moveGeneratorTestTool.GenerateMoves(3);
+            var numberOfLegalMoves4Ply = moveGeneratorTestTool.GenerateMoves(4);
+            //var numberOfLegalMoves5Ply = moveGeneratorTestTool.GenerateMoves(5);
+            //var numberOfLegalMoves6Ply = moveGeneratorTestTool.GenerateMoves(6);
 
             // Assert
-            numberOfLegalMoves.ShouldBe(1);
+            numberOfLegalMoves0Ply.ShouldBe(1);
+            numberOfLegalMoves1Ply.ShouldBe(20);
+            numberOfLegalMoves2Ply.ShouldBe(400);
+            numberOfLegalMoves3Ply.ShouldBe(8902);
+            numberOfLegalMoves4Ply.ShouldBe(197281);
+            //numberOfLegalMoves5Ply.ShouldBe(4865609);
+            //numberOfLegalMoves6Ply.ShouldBe(119060324);
         }
 
         [TestMethod]
-        public void LegalMoves_1ply_ShouldBeCorrect()
+        public void DefaultBoard_BlackToMove_LegalMoves_ShouldBeCorrect()
         {
             // Arrange
-            var moveGeneratorTestTool = new MoveGenerator();
+            var moveGeneratorTestTool = new MoveGenerator("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1 ");
 
             // Act
-            var numberOfLegalMoves = moveGeneratorTestTool.GenerateMoves(1);
+            var numberOfLegalMoves0Ply = moveGeneratorTestTool.GenerateMoves(0);
+            var numberOfLegalMoves1Ply = moveGeneratorTestTool.GenerateMoves(1);
+            var numberOfLegalMoves2Ply = moveGeneratorTestTool.GenerateMoves(2);
+            var numberOfLegalMoves3Ply = moveGeneratorTestTool.GenerateMoves(3);
+            var numberOfLegalMoves4Ply = moveGeneratorTestTool.GenerateMoves(4);
+            //var numberOfLegalMoves5Ply = moveGeneratorTestTool.GenerateMoves(5);
+            //var numberOfLegalMoves6Ply = moveGeneratorTestTool.GenerateMoves(6);
 
             // Assert
-            numberOfLegalMoves.ShouldBe(20);
+            numberOfLegalMoves0Ply.ShouldBe(1);
+            numberOfLegalMoves1Ply.ShouldBe(20);
+            numberOfLegalMoves2Ply.ShouldBe(400);
+            numberOfLegalMoves3Ply.ShouldBe(8902);
+            numberOfLegalMoves4Ply.ShouldBe(197281);
+            //numberOfLegalMoves5Ply.ShouldBe(4865609);
+            //numberOfLegalMoves6Ply.ShouldBe(119060324);
         }
 
         [TestMethod]
-        public void LegalMoves_2ply_ShouldBeCorrect()
+        public void Board1_WhiteToMove_LegalMoves_ShouldBeCorrect()
         {
             // Arrange
-            var moveGeneratorTestTool = new MoveGenerator();
+            var moveGeneratorTestTool = new MoveGenerator("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
 
             // Act
-            var numberOfLegalMoves = moveGeneratorTestTool.GenerateMoves(2);
+            var numberOfLegalMoves0Ply = moveGeneratorTestTool.GenerateMoves(0);
+            var numberOfLegalMoves1Ply = moveGeneratorTestTool.GenerateMoves(1);
+            var numberOfLegalMoves2Ply = moveGeneratorTestTool.GenerateMoves(2);
+            var numberOfLegalMoves3Ply = moveGeneratorTestTool.GenerateMoves(3);
+            var numberOfLegalMoves4Ply = moveGeneratorTestTool.GenerateMoves(4);
+            //var numberOfLegalMoves5Ply = moveGeneratorTestTool.GenerateMoves(5);
+            //var numberOfLegalMoves6Ply = moveGeneratorTestTool.GenerateMoves(6);
 
             // Assert
-            numberOfLegalMoves.ShouldBe(400);
+            numberOfLegalMoves0Ply.ShouldBe(1);
+            numberOfLegalMoves1Ply.ShouldBe(48);
+            numberOfLegalMoves2Ply.ShouldBe(2039);
+            numberOfLegalMoves3Ply.ShouldBe(97862);
+            numberOfLegalMoves4Ply.ShouldBe(4085603);
+            //numberOfLegalMoves5Ply.ShouldBe(193690690);
+            //numberOfLegalMoves6Ply.ShouldBe(8031647685);
         }
-
-        // Tests fail, probably because of pins and castling, which are topics for another day
-
-        //[TestMethod]
-        //public void LegalMoves_3ply_ShouldBeCorrect()
-        //{
-        //    // Arrange
-        //    var moveGeneratorTestTool = new MoveGenerator();
-
-        //    // Act
-        //    var numberOfLegalMoves = moveGeneratorTestTool.GenerateMoves(3);
-
-        //    // Assert
-        //    numberOfLegalMoves.ShouldBe(8902);
-        //}
-
-        //[TestMethod]
-        //public void LegalMoves_4ply_ShouldBeCorrect()
-        //{
-        //    // Arrange
-        //    var moveGeneratorTestTool = new MoveGenerator();
-
-        //    // Act
-        //    var numberOfLegalMoves = moveGeneratorTestTool.GenerateMoves(4);
-
-        //    // Assert
-        //    numberOfLegalMoves.ShouldBe(197281);
-        //}
-
-        //[TestMethod]
-        //public void LegalMoves_5ply_ShouldBeCorrect()
-        //{
-        //    // Arrange
-        //    var moveGeneratorTestTool = new MoveGenerator();
-
-        //    // Act
-        //    var numberOfLegalMoves = moveGeneratorTestTool.GenerateMoves(5);
-
-        //    // Assert
-        //    numberOfLegalMoves.ShouldBe(4865609);
-        //}
-
-        //[TestMethod]
-        //public void LegalMoves_6ply_ShouldBeCorrect()
-        //{
-        //    // Arrange
-        //    var moveGeneratorTestTool = new MoveGenerator();
-
-        //    // Act
-        //    var numberOfLegalMoves = moveGeneratorTestTool.GenerateMoves(6);
-
-        //    // Assert
-        //    numberOfLegalMoves.ShouldBe(119060324);
-        //}
     }
 }

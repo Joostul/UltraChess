@@ -7,9 +7,9 @@ namespace UltraChess.UnitTests.UnitTestTools
     {
         private readonly ChessBoard ChessBoard;
 
-        public MoveGenerator()
+        public MoveGenerator(string FENString)
         {
-            ChessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            ChessBoard = new ChessBoard(FENString);
         }
 
         public int GenerateMoves(int depth)
