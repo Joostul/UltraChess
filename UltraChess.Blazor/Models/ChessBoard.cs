@@ -381,6 +381,7 @@ namespace UltraChess.Blazor.Models
                     break;
             }
 
+            EnPassantSquareId = OldEnPassantSquareId;
             // Set back to correct turn
             IsWhiteTurn = !IsWhiteTurn;
 
@@ -587,19 +588,19 @@ namespace UltraChess.Blazor.Models
             }
 
             // Castling
-            if (IsWhiteTurn && WhiteCanCastleKingSide && !SquareContainsPiece(61) && !SquareContainsPiece(62))
+            if (IsWhiteTurn && WhiteCanCastleKingSide && !SquareContainsPiece(61) && !SquareContainsPiece(62) && fromSquareId == 60)
             {
                 moves.Add(new Move(60, 62) { Flag = MoveFlag.Castling });
             }
-            if (IsWhiteTurn && WhiteCanCastleQueenSide && !SquareContainsPiece(59) && !SquareContainsPiece(58))
+            if (IsWhiteTurn && WhiteCanCastleQueenSide && !SquareContainsPiece(59) && !SquareContainsPiece(58) && fromSquareId == 60)
             {
                 moves.Add(new Move(60, 58) { Flag = MoveFlag.Castling });
             }
-            if (!IsWhiteTurn && BlackCanCastleKingSide && !SquareContainsPiece(5) && !SquareContainsPiece(6))
+            if (!IsWhiteTurn && BlackCanCastleKingSide && !SquareContainsPiece(5) && !SquareContainsPiece(6) && fromSquareId == 4)
             {
                 moves.Add(new Move(4, 6) { Flag = MoveFlag.Castling });
             }
-            if (!IsWhiteTurn && BlackCanCastleQueenSide && !SquareContainsPiece(3) && !SquareContainsPiece(2))
+            if (!IsWhiteTurn && BlackCanCastleQueenSide && !SquareContainsPiece(3) && !SquareContainsPiece(2) && fromSquareId == 4)
             {
                 moves.Add(new Move(4, 2) { Flag = MoveFlag.Castling });
             }
