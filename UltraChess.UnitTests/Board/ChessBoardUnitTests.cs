@@ -160,7 +160,7 @@ namespace UltraChess.UnitTests.Board
             var legalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
 
             // Assert
-            sut.EnPassantSquare.ShouldBe(19);
+            sut.EnPassantSquareId.ShouldBe(19);
             legalMoves.ShouldContain(m => m.FromSquareId == 28 && m.ToSquareId == 19 && m.Flag == MoveFlag.EnPassant && m.CapturedPieceId == 7,
                     $"Move from: {enPassantMove.FromSquareId} to: {enPassantMove.ToSquareId}, capturing: {enPassantMove.CapturedPieceId} not found.");
         }
