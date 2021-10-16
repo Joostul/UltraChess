@@ -381,6 +381,7 @@ namespace UltraChess.Blazor.Models
                     break;
             }
 
+            EnPassantSquareId = OldEnPassantSquareId;
             // Set back to correct turn
             IsWhiteTurn = !IsWhiteTurn;
 
