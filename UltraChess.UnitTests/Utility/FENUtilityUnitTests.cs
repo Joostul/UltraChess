@@ -27,6 +27,25 @@ namespace UltraChess.UnitTests.Utility
         }
 
         [TestMethod]
+        public void OnlyTwoKingsFENString_GetFENBoard_IsCorrect()
+        {
+            // Act
+            var result = FENUtility.GetBoardPositionInfo("k6K/8/8/8/8/8/8/8 w KQkq - 0 1");
+
+            // Assert
+            result.Board.ShouldBe(new char[64] {
+                'k','0','0','0','0','0','0','K',
+                '0','0','0','0','0','0','0','0',
+                '0','0','0','0','0','0','0','0',
+                '0','0','0','0','0','0','0','0',
+                '0','0','0','0','0','0','0','0',
+                '0','0','0','0','0','0','0','0',
+                '0','0','0','0','0','0','0','0',
+                '0','0','0','0','0','0','0','0'
+            });
+        }
+
+        [TestMethod]
         public void DefaultFENString_GetIsWhiteTurn_IsCorrect()
         {
             // Act
