@@ -157,7 +157,7 @@ namespace UltraChess.UnitTests.Board
             var enPassantMove = new Move(28, 19, 7) { Flag = MoveFlag.EnPassant };
             sut.MakeMove(enPassantMove);
             sut.UnMakeMove(enPassantMove);
-            var legalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            var legalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             sut.EnPassantSquareId.ShouldBe(19);

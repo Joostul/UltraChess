@@ -48,7 +48,7 @@ namespace UltraChess.UnitTests.Board
 
             // Act
             sut.MakeMove(new Move(52, 36));
-            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             var expectedMoves = new List<Move>
@@ -82,9 +82,9 @@ namespace UltraChess.UnitTests.Board
 
             // Act
             sut.MakeMove(new Move(52, 36));
-            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
             sut.MakeMove(new Move(13, 29));
-            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             var expectedMoves = new List<Move>
@@ -121,13 +121,13 @@ namespace UltraChess.UnitTests.Board
 
             // Act
             sut.MakeMove(new Move(52, 36));
-            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
             sut.MakeMove(new Move(13, 29));
-            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
             sut.MakeMove(new Move(36, 29));
-            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
             sut.MakeMove(new Move(12, 28) { Flag = MoveFlag.PawnTwoForward });
-            sut.LegalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            sut.LegalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             var expectedMoves = new List<Move>

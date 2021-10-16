@@ -19,7 +19,7 @@ namespace UltraChess.UnitTests.UnitTestTools
                 return 1;
             }
 
-            List<Move> moves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn);
+            List<Move> moves = ChessBoard.GenerateLegalMoves(ChessBoard.CurrentBoardInfo.IsWhiteTurn);
             int numberOfPosiitions = 0;
 
             foreach (var move in moves)
