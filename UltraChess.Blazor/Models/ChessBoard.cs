@@ -38,6 +38,10 @@ namespace UltraChess.Blazor.Models
         public int OldEnPassantSquareId = 64;
         public List<Move> LegalMoves;
         public Stack<Move> MovesMade = new();
+        public bool WhiteCanCastleKingSide = true;
+        public bool WhiteCanCastleQueenSide = true;
+        public bool BlackCanCastleKingSide = true;
+        public bool BlackCanCastleQueenSide = true;
 
         // Settings
         public bool AutoPromoteQueen = true;
@@ -49,6 +53,10 @@ namespace UltraChess.Blazor.Models
         {
             var boardPositionInfo = FENUtility.GetBoardPositionInfo(FEN);
             IsWhiteTurn = boardPositionInfo.IsWhiteTurn;
+            WhiteCanCastleKingSide = boardPositionInfo.WhiteCanCastleKingSide;
+            WhiteCanCastleQueenSide = boardPositionInfo.WhiteCanCastleQueenSide;
+            BlackCanCastleKingSide = boardPositionInfo.BlackCanCastleKingSide;
+            BlackCanCastleQueenSide = boardPositionInfo.BlackCanCastleQueenSide;
 
             for (int file = 0; file < 8; file++)
             {
@@ -198,6 +206,72 @@ namespace UltraChess.Blazor.Models
                         Squares[fromSquareId].PieceId = 0;
                         EnPassantSquareId = toSquareId + DirectionOffsets[Convert.ToInt32(IsWhiteTurn)];
                         break;
+                    case MoveFlag.Castling:
+                        if (Squares[fromSquareId].PieceId == 6)
+                        {
+                            WhiteCanCastleKingSide = false;
+                            WhiteCanCastleQueenSide = false;
+                            Squares[toSquareId].PieceId = 6;
+                            if (move.ToSquareId == 58)
+                            {
+                                Squares[56].PieceId = 0;
+                                Squares[59].PieceId = 4;
+                            } else if(move.ToSquareId == 62)
+                            {
+                                Squares[63].PieceId = 0;
+                                Squares[61].PieceId = 4;
+                            }
+                        }
+                        else
+                        {
+                            BlackCanCastleKingSide = false;
+                            BlackCanCastleQueenSide = false;
+                            Squares[toSquareId].PieceId = 12;
+                            if (move.ToSquareId == 2)
+                            {
+                                Squares[0].PieceId = 0;
+                                Squares[3].PieceId = 4;
+                            }
+                            else if (move.ToSquareId == 6)
+                            {
+                                Squares[7].PieceId = 0;
+                                Squares[5].PieceId = 4;
+                            }
+                        }
+                        Squares[fromSquareId].PieceId = 0;
+                        break;
+                    case MoveFlag.BreakCastlingRights:
+                        if (Squares[fromSquareId].PieceId == 6)
+                        {
+                            WhiteCanCastleKingSide = false;
+                            WhiteCanCastleQueenSide = false;
+                        }
+                        else
+                        {
+                            BlackCanCastleKingSide = false;
+                            BlackCanCastleQueenSide = false;
+                        }
+                        break;
+                    case MoveFlag.BreakKingsideCastlingRights:
+                        if (Squares[fromSquareId].PieceId == 6)
+                        {
+                            WhiteCanCastleKingSide = false;
+                        }
+                        else
+                        {
+                            BlackCanCastleKingSide = false;
+                        }
+                        break;
+                    case MoveFlag.BreakQueensideCastingRights:
+                        if (Squares[fromSquareId].PieceId == 6)
+                        {
+                            WhiteCanCastleQueenSide = false;
+                        }
+                        else
+                        {
+                            BlackCanCastleQueenSide = false;
+                        }
+                        break;
                     case MoveFlag.None:
                     default:
                         Squares[toSquareId].PieceId = Squares[fromSquareId].PieceId;
@@ -214,44 +288,115 @@ namespace UltraChess.Blazor.Models
 
         public void UnMakeMove(Move move)
         {
-            // Move the piece back
-            Squares[move.FromSquareId].PieceId = Squares[move.ToSquareId].PieceId;
-
-            // If there was no capture, set the tosquare piece back to nothing
-            if (move.CapturedPieceId == 0)
+            switch (move.Flag)
             {
-                Squares[move.ToSquareId].PieceId = 0;
-            }
-            else
-            {
-                // If there was a capture and it was en passant, set the pawn back
-                if (move.Flag == MoveFlag.EnPassant)
-                {
-                    // Move the pawn back to original square
+                case MoveFlag.EnPassant:
+                    // Move the piece back
+                    Squares[move.FromSquareId].PieceId = Squares[move.ToSquareId].PieceId;
+                    // Move the captured pawn back to original square
                     Squares[move.ToSquareId - DirectionOffsets[Convert.ToInt32(IsWhiteTurn)]].PieceId = move.CapturedPieceId;
                     // Set the captured square back to 0 piece
                     Squares[move.ToSquareId].PieceId = 0;
-                }
-                else
-                {
-                    // If it was a normal capture, set the captured piece back
-                    Squares[move.ToSquareId].PieceId = move.CapturedPieceId;
-                }
+                    break;
+                case MoveFlag.PawnPromotion:
+                    Squares[move.FromSquareId].PieceId = GetPiece(Squares[move.FromSquareId].Id).IsWhite ? 1 : 7;
+                    break;
+                case MoveFlag.Castling:
+                    if (Squares[move.ToSquareId].PieceId == 6)
+                    {
+                        WhiteCanCastleKingSide = true;
+                        WhiteCanCastleQueenSide = true;
+                        Squares[move.FromSquareId].PieceId = 6;
+                        if (move.ToSquareId == 58)
+                        {
+                            Squares[59].PieceId = 0;
+                            Squares[56].PieceId = 4;
+                        }
+                        else if (move.ToSquareId == 62)
+                        {
+                            Squares[61].PieceId = 0;
+                            Squares[63].PieceId = 4;
+                        }
+                    }
+                    else
+                    {
+                        BlackCanCastleKingSide = true;
+                        BlackCanCastleQueenSide = true;
+                        Squares[move.FromSquareId].PieceId = 12;
+                        if (move.ToSquareId == 2)
+                        {
+                            Squares[3].PieceId = 0;
+                            Squares[0].PieceId = 4;
+                        }
+                        else if (move.ToSquareId == 6)
+                        {
+                            Squares[5].PieceId = 0;
+                            Squares[7].PieceId = 4;
+                        }
+                    }
+                    Squares[move.ToSquareId].PieceId = 0;
+                    break;
+                case MoveFlag.BreakCastlingRights:
+                    if (Squares[move.FromSquareId].PieceId == 6)
+                    {
+                        WhiteCanCastleKingSide = true;
+                        WhiteCanCastleQueenSide = true;
+                    }
+                    else
+                    {
+                        BlackCanCastleKingSide = true;
+                        BlackCanCastleQueenSide = true;
+                    }
+                    break;
+                case MoveFlag.BreakKingsideCastlingRights:
+                    if (Squares[move.FromSquareId].PieceId == 6)
+                    {
+                        WhiteCanCastleKingSide = true;
+                    }
+                    else
+                    {
+                        BlackCanCastleKingSide = true;
+                    }
+                    break;
+                case MoveFlag.BreakQueensideCastingRights:
+                    if (Squares[move.FromSquareId].PieceId == 6)
+                    {
+                        WhiteCanCastleQueenSide = true;
+                    }
+                    else
+                    {
+                        BlackCanCastleQueenSide = true;
+                    }
+                    break;
+                case MoveFlag.None:
+                case MoveFlag.PawnTwoForward:
+                default:
+                    // Move the piece back
+                    Squares[move.FromSquareId].PieceId = Squares[move.ToSquareId].PieceId;
+                    if (move.CapturedPieceId == 0)
+                    {
+                        // If there was no capture, set the tosquare piece back to nothing
+                        Squares[move.ToSquareId].PieceId = 0;
+                    }
+                    else
+                    {
+                        // Set the captured piece back
+                        Squares[move.ToSquareId].PieceId = move.CapturedPieceId;
+                    }
+                    break;
             }
-
-            // Unpromote if a promotion took place
-            if (move.Flag == MoveFlag.PawnPromotion)
-            {
-                Squares[move.FromSquareId].PieceId = GetPiece(Squares[move.FromSquareId].Id).IsWhite ? 1 : 7;
-            }
-
-            // Set en passant square back
-            EnPassantSquareId = OldEnPassantSquareId;
 
             // Set back to correct turn
             IsWhiteTurn = !IsWhiteTurn;
 
             MovesMade.Pop();
+
+            // If the last move before this was pawn two forward, set back en passant square
+            MovesMade.TryPeek(out Move moveMade);
+            if(moveMade != null && moveMade.Flag == MoveFlag.PawnTwoForward)
+            {
+                EnPassantSquareId = moveMade.ToSquareId + DirectionOffsets[Convert.ToInt32(!IsWhiteTurn)];
+            }
         }
 
         public List<Move> GenerateMoves(bool isWhite)
@@ -280,10 +425,11 @@ namespace UltraChess.Blazor.Models
                 MakeMove(move);
                 
                 var opponentResponses = GenerateMoves(!isWhite);
-                if (!opponentResponses.Exists(r => r.CapturedPieceId == yourPieceKingId))
+                if (!opponentResponses.Exists(r => r.CapturedPieceId == yourPieceKingId)) // TODO: On castling check if not in check
                 {
                     legalMoves.Add(move);
                 }
+
                 UnMakeMove(move);
             }
 
@@ -414,9 +560,28 @@ namespace UltraChess.Blazor.Models
         List<Move> GenerateKingMoves(int fromSquareId)
         {
             var moves = GenerateSlidingMoves(fromSquareId, 0, 8, 1);
+            if (IsWhiteTurn && fromSquareId == 60)
+            {
+                moves.ForEach(m => m.Flag = MoveFlag.BreakCastlingRights);
+            }
 
             // Castling
-
+            if (IsWhiteTurn && WhiteCanCastleKingSide && !SquareContainsPiece(61) && !SquareContainsPiece(62))
+            {
+                moves.Add(new Move(60, 62) { Flag = MoveFlag.Castling });
+            }
+            if (IsWhiteTurn && WhiteCanCastleQueenSide && !SquareContainsPiece(59) && !SquareContainsPiece(58))
+            {
+                moves.Add(new Move(60, 58) { Flag = MoveFlag.Castling });
+            }
+            if (!IsWhiteTurn && BlackCanCastleKingSide && !SquareContainsPiece(5) && !SquareContainsPiece(6))
+            {
+                moves.Add(new Move(4, 6) { Flag = MoveFlag.Castling });
+            }
+            if (!IsWhiteTurn && BlackCanCastleQueenSide && !SquareContainsPiece(3) && !SquareContainsPiece(2))
+            {
+                moves.Add(new Move(4, 2) { Flag = MoveFlag.Castling });
+            }
 
             return moves;
         }
