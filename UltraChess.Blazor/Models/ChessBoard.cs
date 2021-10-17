@@ -609,7 +609,7 @@ namespace UltraChess.Blazor.Models
             {
                 moves.Add(new Move(60, 62) { Flag = MoveFlag.Castling });
             }
-            if (CurrentBoardInfo.IsWhiteTurn && WhiteCanCastleQueenSide && !SquareContainsPiece(59) && !SquareContainsPiece(58) && fromSquareId == 60)
+            if (CurrentBoardInfo.IsWhiteTurn && WhiteCanCastleQueenSide && !SquareContainsPiece(59) && !SquareContainsPiece(58) && !SquareContainsPiece(57) && fromSquareId == 60)
             {
                 moves.Add(new Move(60, 58) { Flag = MoveFlag.Castling });
             }
@@ -617,7 +617,7 @@ namespace UltraChess.Blazor.Models
             {
                 moves.Add(new Move(4, 6) { Flag = MoveFlag.Castling });
             }
-            if (!CurrentBoardInfo.IsWhiteTurn && BlackCanCastleQueenSide && !SquareContainsPiece(3) && !SquareContainsPiece(2) && fromSquareId == 4)
+            if (!CurrentBoardInfo.IsWhiteTurn && BlackCanCastleQueenSide && !SquareContainsPiece(3) && !SquareContainsPiece(2) && !SquareContainsPiece(1) && fromSquareId == 4)
             {
                 moves.Add(new Move(4, 2) { Flag = MoveFlag.Castling });
             }
