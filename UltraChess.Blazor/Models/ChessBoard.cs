@@ -304,7 +304,7 @@ namespace UltraChess.Blazor.Models
                     Squares[move.ToSquareId].PieceId = 0;
                     break;
                 case MoveFlag.PawnPromotion:
-                    Squares[move.FromSquareId].PieceId = GetPiece(move.FromSquareId).IsWhite ? 1 : 7;
+                    Squares[move.FromSquareId].PieceId = GetPiece(move.ToSquareId).IsWhite ? 1 : 7;
                     break;
                 case MoveFlag.Castling:
                     if (Squares[move.ToSquareId].PieceId == 6)
@@ -443,9 +443,24 @@ namespace UltraChess.Blazor.Models
             foreach (var move in pseudoLegalMoves)
             {
                 MakeMove(move);
-                
                 var opponentResponses = GenerateMoves(!isWhite);
-                if (!opponentResponses.Exists(r => r.CapturedPieceId == yourPieceKingId)) // TODO: On castling check if not in check
+
+                if (move.Flag == MoveFlag.Castling)
+                {
+                    int middleSquareId;
+                    if(move.FromSquareId > move.ToSquareId)
+                    {
+                        middleSquareId = move.FromSquareId - 1;
+                    }
+                    else
+                    {
+                        middleSquareId = move.FromSquareId + 1;
+                    }
+                    if (!opponentResponses.Exists(r => r.ToSquareId == move.FromSquareId || r.ToSquareId == move.ToSquareId || r.ToSquareId == middleSquareId))
+                    {
+                        legalMoves.Add(move);
+                    }
+                } else if (!opponentResponses.Exists(r => r.CapturedPieceId == yourPieceKingId))
                 {
                     legalMoves.Add(move);
                 }
