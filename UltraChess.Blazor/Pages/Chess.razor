@@ -151,9 +151,9 @@
 
     void UnMakeMove()
     {
-        if(ChessBoard.MovesMade.Count > 0)
+        if(ChessBoard.MoveHistory.Count > 0)
         {
-            ChessBoard.UnMakeMove(ChessBoard.MovesMade.Peek());
+            ChessBoard.UnMakeMove(ChessBoard.MoveHistory.Peek());
             ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.CurrentBoardInfo.IsWhiteTurn);
         }
     }

@@ -2,6 +2,24 @@
 {
     public class BoardInfo
     {
+        public BoardInfo()
+        {
+
+        }
+
+        public BoardInfo(BoardInfo boardInfo)
+        {
+            Board = boardInfo.Board;
+            IsWhiteTurn = boardInfo.IsWhiteTurn;
+            WhiteCanCastleKingSide = boardInfo.WhiteCanCastleKingSide;
+            WhiteCanCastleQueenSide = boardInfo.WhiteCanCastleQueenSide;
+            BlackCanCastleKingSide = boardInfo.BlackCanCastleKingSide;
+            BlackCanCastleQueenSide = boardInfo.BlackCanCastleQueenSide;
+            EnPassantSquareId = boardInfo.EnPassantSquareId;
+            HalfClockMove = boardInfo.HalfClockMove;
+            FullMoveNumber = boardInfo.FullMoveNumber;
+        }
+
         public char[] Board { get; set; }
         public bool IsWhiteTurn { get; set; }
         public bool WhiteCanCastleKingSide { get; set; }
