@@ -65,21 +65,21 @@ namespace UltraChess.UnitTests.Board
 
             // Act
             var numberOfLegalMoves0Ply = moveGeneratorTestTool.GenerateMoves(0);
+            numberOfLegalMoves0Ply.ShouldBe(1);
             var numberOfLegalMoves1Ply = moveGeneratorTestTool.GenerateMoves(1);
+            numberOfLegalMoves1Ply.ShouldBe(48);
             var numberOfLegalMoves2Ply = moveGeneratorTestTool.GenerateMoves(2);
+            numberOfLegalMoves2Ply.ShouldBe(2039);
             var numberOfLegalMoves3Ply = moveGeneratorTestTool.GenerateMoves(3);
+            numberOfLegalMoves3Ply.ShouldBe(97862);
             //var numberOfLegalMoves4Ply = moveGeneratorTestTool.GenerateMoves(4);
+            //numberOfLegalMoves4Ply.ShouldBe(4085603);
             //var numberOfLegalMoves5Ply = moveGeneratorTestTool.GenerateMoves(5);
+            //numberOfLegalMoves5Ply.ShouldBe(193690690);
             //var numberOfLegalMoves6Ply = moveGeneratorTestTool.GenerateMoves(6);
+            //numberOfLegalMoves6Ply.ShouldBe(8031647685);
 
             // Assert
-            numberOfLegalMoves0Ply.ShouldBe(1);
-            numberOfLegalMoves1Ply.ShouldBe(48);
-            numberOfLegalMoves2Ply.ShouldBe(2039);
-            numberOfLegalMoves3Ply.ShouldBe(97862);
-            //numberOfLegalMoves4Ply.ShouldBe(4085603);
-            //numberOfLegalMoves5Ply.ShouldBe(193690690);
-            //numberOfLegalMoves6Ply.ShouldBe(8031647685);
         }
     }
 }
