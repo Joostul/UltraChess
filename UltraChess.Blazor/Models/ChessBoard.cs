@@ -15,7 +15,6 @@ namespace UltraChess.Blazor.Models
         public readonly int[][] NumberOfSquaresToEdge = new int[64][];
         public readonly int[] AllKnightJumps = { 15, 17, -17, -15, 10, -6, 6, -10 };
         public readonly int[][] KnightMoves = new int[64][];
-        public int[] PromotionPiece = new int[2] { 11, 5 };
         public Square[] Squares = new Square[64];
         public Piece[] Pieces = new Piece[13]
         {
@@ -46,12 +45,6 @@ namespace UltraChess.Blazor.Models
         public bool BlackCanCastleQueenSide = true;
         public int HalfClockMove = 0;
         public int FullMoveNumber = 0;
-
-        // Settings
-        public bool AutoPromoteQueen = true;
-
-        // 
-        public bool PromotionModalIsOpen;
 
         public ChessBoard(string FEN)
         {
@@ -183,7 +176,7 @@ namespace UltraChess.Blazor.Models
             int toSquareId = move.ToSquareId;
 
             // If we are moving to the same square
-            if (move.FromSquareId == move.ToSquareId)
+            if (fromSquareId == toSquareId)
             {
                 return false;
             }
@@ -201,7 +194,7 @@ namespace UltraChess.Blazor.Models
                         break;
                     case MoveFlag.PawnPromotion:
                         Squares[fromSquareId].PieceId = 0;
-                        Squares[toSquareId].PieceId = PromotionPiece[Convert.ToInt32(pieceToMove.IsWhite)];
+                        Squares[toSquareId].PieceId = move.PromotionPieceId;
                         break;
                     case MoveFlag.PawnTwoForward:
                         Squares[toSquareId].PieceId = Squares[fromSquareId].PieceId;
@@ -305,6 +298,7 @@ namespace UltraChess.Blazor.Models
                     break;
                 case MoveFlag.PawnPromotion:
                     Squares[move.FromSquareId].PieceId = GetPiece(move.ToSquareId).IsWhite ? 1 : 7;
+                    Squares[move.ToSquareId].PieceId = move.CapturedPieceId;
                     break;
                 case MoveFlag.Castling:
                     if (Squares[move.ToSquareId].PieceId == 6)
@@ -527,22 +521,7 @@ namespace UltraChess.Blazor.Models
             var toSquareId = fromSquareId + DirectionOffsets[direction];
             if (!SquareContainsPiece(toSquareId))
             {
-                if (Squares[toSquareId].Rank != promotionRank)
-                {
-                    moves.Add(new Move(fromSquareId, toSquareId));
-                }
-                else
-                {
-                    if (!AutoPromoteQueen)
-                    {
-                        // Open modal
-                        PromotionModalIsOpen = true;
-                    }
-                    else
-                    {
-                        moves.Add(new Move(fromSquareId, toSquareId) { Flag = MoveFlag.PawnPromotion });
-                    }
-                }
+                moves.Add(new Move(fromSquareId, toSquareId));
             }
 
             // Or two from the starting rank
@@ -562,23 +541,7 @@ namespace UltraChess.Blazor.Models
                 if (SquareContainsEnemyPiece(piece.IsWhite, diagonalCapture.ToSquareId))
                 {
                     diagonalCapture.CapturedPieceId = Squares[diagonalCapture.ToSquareId].PieceId;
-                    if (Squares[diagonalCapture.ToSquareId].Rank != promotionRank)
-                    {
-                        moves.Add(diagonalCapture);
-                    }
-                    else
-                    {
-                        if (!AutoPromoteQueen)
-                        {
-                            // Open modal
-                            PromotionModalIsOpen = true;
-                        }
-                        else
-                        {
-                            diagonalCapture.Flag = MoveFlag.PawnPromotion;
-                            moves.Add(diagonalCapture);
-                        }
-                    }
+                    moves.Add(diagonalCapture);
                 }
                 else if (EnPassantSquareId == diagonalCapture.ToSquareId && SquareContainsEnemyPiece(piece.IsWhite, Squares[diagonalCapture.ToSquareId + DirectionOffsets[Convert.ToInt32(CurrentBoardInfo.IsWhiteTurn)]].Id))
                 {
@@ -589,6 +552,38 @@ namespace UltraChess.Blazor.Models
                 }
             }
 
+            var promotionMoves = new List<Move>();
+
+            // Tag promotions and add piece variations
+            foreach (var move in moves)
+            {
+                if (Squares[move.ToSquareId].Rank == promotionRank)
+                {
+                    var promotionPieceIsWhite = GetPiece(move.FromSquareId).IsWhite;
+                    move.Flag = MoveFlag.PawnPromotion;
+                    move.PromotionPieceId = promotionPieceIsWhite ? 2 : 8;
+
+                    promotionMoves.Add(new Move(move.FromSquareId, move.ToSquareId)
+                    {
+                        CapturedPieceId = move.CapturedPieceId,
+                        Flag = MoveFlag.PawnPromotion,
+                        PromotionPieceId = promotionPieceIsWhite ? 3 : 9
+                    });
+                    promotionMoves.Add(new Move(move.FromSquareId, move.ToSquareId)
+                    {
+                        CapturedPieceId = move.CapturedPieceId,
+                        Flag = MoveFlag.PawnPromotion,
+                        PromotionPieceId = promotionPieceIsWhite ? 4 : 10
+                    });
+                    promotionMoves.Add(new Move(move.FromSquareId, move.ToSquareId)
+                    {
+                        CapturedPieceId = move.CapturedPieceId,
+                        Flag = MoveFlag.PawnPromotion,
+                        PromotionPieceId = promotionPieceIsWhite ? 5 : 11
+                    });
+                }
+            }
+            moves.AddRange(promotionMoves);
             return moves;
         }
 

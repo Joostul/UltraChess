@@ -71,14 +71,18 @@
 </div>
 
 @code {
-    string modalClass => ChessBoard.PromotionModalIsOpen ? "modal fade show" : "modal fade";
-    string displayMode => ChessBoard.PromotionModalIsOpen ? "block" : "none";
+    string modalClass => PromotionModalIsOpen ? "modal fade show" : "modal fade";
+    string displayMode => PromotionModalIsOpen ? "block" : "none";
 
     private ChessBoard ChessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    private readonly int[][] PromotionPieces = new int[2][] { new int[] { 8, 9, 10, 11 }, new int[] { 2, 3, 4, 5 } };
     private int FromSquareId;
     private int ToSquareId;
     private string FENString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+    // Promotion
+    private readonly int[][] PromotionPieces = new int[2][] { new int[] { 8, 9, 10, 11 }, new int[] { 2, 3, 4, 5 } };
+    private bool PromotionModalIsOpen = false;
+    private bool AutoPromoteQueen = true;
 
     void StartDrag(int fromSquareId)
     {
@@ -92,30 +96,57 @@
         ChessBoard.HighlightMoves(ChessBoard.LegalMoves, false);
         ToSquareId = toSquareId;
         var moveToMake = ChessBoard.LegalMoves.FirstOrDefault(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId);
-        if (moveToMake != null)
+        if(moveToMake == null)
         {
-            var moveMade = ChessBoard.MakeMove(moveToMake);
-            if (moveMade)
+            return;
+        }
+        else
+        {
+            if (moveToMake.Flag == MoveFlag.PawnPromotion)
             {
-                ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.CurrentBoardInfo.IsWhiteTurn);
+                if (AutoPromoteQueen)
+                {
+                    var pieceToMove = ChessBoard.Pieces[ChessBoard.Squares[moveToMake.FromSquareId].PieceId];
+                    moveToMake.PromotionPieceId = PromotionPieces[Convert.ToInt32(pieceToMove.IsWhite)][3];
+                    MakeMoveOnBoard(moveToMake);
+                }
+                else
+                {
+                    ShowModal();
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                MakeMoveOnBoard(moveToMake);
             }
         }
     }
 
+    private void MakeMoveOnBoard(Move move)
+    {
+        var moveMade = ChessBoard.MakeMove(move);
+        if (moveMade)
+        {
+            ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.CurrentBoardInfo.IsWhiteTurn);
+        }
+
+    }
+
     void ToggleAutoPromote()
     {
-        ChessBoard.AutoPromoteQueen = !ChessBoard.AutoPromoteQueen;
+        AutoPromoteQueen = !AutoPromoteQueen;
     }
 
     private void ToggleModal()
     {
-        ChessBoard.PromotionModalIsOpen = !ChessBoard.PromotionModalIsOpen;
+        PromotionModalIsOpen = !PromotionModalIsOpen;
         StateHasChanged();
     }
 
     void ShowModal()
     {
-        ChessBoard.PromotionModalIsOpen = true;
+        PromotionModalIsOpen = true;
     }
 
     void UnMakeMove()
@@ -129,7 +160,11 @@
 
     private void SelectPromotionPiece(int id)
     {
-        var promotionPieceIndex = Convert.ToInt32(ChessBoard.CurrentBoardInfo.IsWhiteTurn);
-        ChessBoard.PromotionModalIsOpen = false;
+        var moveToMake = ChessBoard.LegalMoves.FirstOrDefault(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId);
+
+        var pieceToMove = ChessBoard.Pieces[ChessBoard.Squares[moveToMake.FromSquareId].PieceId];
+        moveToMake.PromotionPieceId = PromotionPieces[Convert.ToInt32(pieceToMove.IsWhite)][id];
+        PromotionModalIsOpen = false;
+        MakeMoveOnBoard(moveToMake);
     }
 }
