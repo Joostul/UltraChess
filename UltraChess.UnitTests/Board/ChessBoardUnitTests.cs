@@ -154,14 +154,14 @@ namespace UltraChess.UnitTests.Board
             sut.MakeMove(new Move(8, 16));
             sut.MakeMove(new Move(36, 28));
             sut.MakeMove(new Move(11, 27) { Flag = MoveFlag.PawnTwoForward });
-            var enPassantMove = new Move(28, 19, 7) { Flag = MoveFlag.EnPassant };
+            var enPassantMove = new Move(28, 19, 7) { Flag = MoveFlag.EnPassantCapture };
             sut.MakeMove(enPassantMove);
             sut.UnMakeMove(enPassantMove);
-            var legalMoves = sut.GenerateLegalMoves(sut.IsWhiteTurn);
+            var legalMoves = sut.GenerateLegalMoves(sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
-            sut.EnPassantSquareId.ShouldBe(19);
-            legalMoves.ShouldContain(m => m.FromSquareId == 28 && m.ToSquareId == 19 && m.Flag == MoveFlag.EnPassant && m.CapturedPieceId == 7,
+            sut.CurrentBoardInfo.EnPassantSquareId.ShouldBe(19);
+            legalMoves.ShouldContain(m => m.FromSquareId == 28 && m.ToSquareId == 19 && m.Flag == MoveFlag.EnPassantCapture && m.CapturedPieceId == 7,
                     $"Move from: {enPassantMove.FromSquareId} to: {enPassantMove.ToSquareId}, capturing: {enPassantMove.CapturedPieceId} not found.");
         }
 
@@ -180,7 +180,7 @@ namespace UltraChess.UnitTests.Board
             sut.MakeMove(new Move(19, 27));
             sut.MakeMove(new Move(22, 15, 7));
             sut.MakeMove(new Move(27, 35));
-            sut.MakeMove(new Move(15, 6, 8) { Flag = MoveFlag.PawnPromotion });
+            sut.MakeMove(new Move(15, 6, 8) { Flag = MoveFlag.PawnPromotion, PromotionPieceId = 5 });
 
             // Assert
             sut.Squares[6].PieceId.ShouldBe(5);

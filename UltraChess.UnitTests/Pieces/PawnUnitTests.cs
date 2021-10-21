@@ -15,7 +15,7 @@ namespace UltraChess.UnitTests.Pieces
             var sut = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             // Act
-            var moves = sut.GetMovesFromSquare(8, sut.IsWhiteTurn);
+            var moves = sut.GetMovesFromSquare(8, sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             moves.ShouldBe(new List<Move> { });
@@ -29,7 +29,7 @@ namespace UltraChess.UnitTests.Pieces
             var sut = new ChessBoard("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2");
 
             // Act
-            var moves = sut.GetMovesFromSquare(36, sut.IsWhiteTurn);
+            var moves = sut.GetMovesFromSquare(36, sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             moves.ShouldBe(new List<Move> { });
@@ -45,7 +45,7 @@ namespace UltraChess.UnitTests.Pieces
             sut.MakeMove(new Move(13, 29));
 
             // Act
-            var moves = sut.GetMovesFromSquare(36, sut.IsWhiteTurn);
+            var moves = sut.GetMovesFromSquare(36, sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             var expectedMoves = new List<Move> { new Move(36, 28), new Move(36, 29, 7) };
@@ -68,7 +68,7 @@ namespace UltraChess.UnitTests.Pieces
             sut.MakeMove(new Move(11, 27) { Flag = MoveFlag.PawnTwoForward });
 
             // Act
-            var moves = sut.GetMovesFromSquare(28, sut.IsWhiteTurn);
+            var moves = sut.GetMovesFromSquare(28, sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             var expectedMoves = new List<Move> { new Move(28, 20), new Move(28, 19, 7) };
@@ -87,7 +87,7 @@ namespace UltraChess.UnitTests.Pieces
             var sut = new ChessBoard("rnbqkbnr/ppppp2p/6p1/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3");
 
             // Act
-            var moves = sut.GetMovesFromSquare(28, sut.IsWhiteTurn);
+            var moves = sut.GetMovesFromSquare(28, sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             var expectedMoves = new List<Move> { new Move(28, 20), new Move(28, 21, 7) };

@@ -1,5 +1,6 @@
 ﻿@page "/chess"
 @using UltraChess.Blazor.Models
+@using UltraChess.Blazor.Constants 
 
 <div class="container">
     <div class="mb-1 row align-items-start">
@@ -33,16 +34,16 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <img id="queen-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/Q_W.png" : "img/Q_B.png")" @onclick="() => SelectPromotionPiece(3)" />
+                        <img id="queen-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.CurrentBoardInfo.IsWhiteTurn ? "img/Q_W.png" : "img/Q_B.png")" @onclick="() => SelectPromotionPiece(3)" />
                     </div>
                     <div class="mb-3">
-                        <img id="knight-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/N_W.png" : "img/N_B.png")" @onclick="() => SelectPromotionPiece(0)" />
+                        <img id="knight-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.CurrentBoardInfo.IsWhiteTurn ? "img/N_W.png" : "img/N_B.png")" @onclick="() => SelectPromotionPiece(0)" />
                     </div>
                     <div class="mb-3">
-                        <img id="rook-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/R_W.png" : "img/R_B.png")" @onclick="() => SelectPromotionPiece(2)" />
+                        <img id="rook-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.CurrentBoardInfo.IsWhiteTurn ? "img/R_W.png" : "img/R_B.png")" @onclick="() => SelectPromotionPiece(2)" />
                     </div>
                     <div class="mb-3">
-                        <img id="bishop-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.IsWhiteTurn ? "img/B_W.png" : "img/B_B.png")" @onclick="() => SelectPromotionPiece(1)" />
+                        <img id="bishop-promotion" class="rounded mx-auto d-block img-thumbnail" src="@(ChessBoard.CurrentBoardInfo.IsWhiteTurn ? "img/B_W.png" : "img/B_B.png")" @onclick="() => SelectPromotionPiece(1)" />
                     </div>
                 </div>
             </div>
@@ -60,7 +61,7 @@
                     @{
                         if (square.PieceId != 0)
                         {
-                            <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessBoard.Pieces[square.PieceId].Image)" @ondrag="@(() => StartDrag(square.Id))" ondrop="event.preventDefault();" />
+                            <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessConstants.Pieces[square.PieceId].Image)" @ondrag="@(() => StartDrag(square.Id))" ondrop="event.preventDefault();" />
                         }
                     }
                 </div>
@@ -71,14 +72,18 @@
 </div>
 
 @code {
-    string modalClass => ChessBoard.PromotionModalIsOpen ? "modal fade show" : "modal fade";
-    string displayMode => ChessBoard.PromotionModalIsOpen ? "block" : "none";
+    string modalClass => PromotionModalIsOpen ? "modal fade show" : "modal fade";
+    string displayMode => PromotionModalIsOpen ? "block" : "none";
 
     private ChessBoard ChessBoard = new ChessBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    private readonly int[][] PromotionPieces = new int[2][] { new int[] { 8, 9, 10, 11 }, new int[] { 2, 3, 4, 5 } };
     private int FromSquareId;
     private int ToSquareId;
     private string FENString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+    // Promotion
+    private readonly int[][] PromotionPieces = new int[2][] { new int[] { 8, 9, 10, 11 }, new int[] { 2, 3, 4, 5 } };
+    private bool PromotionModalIsOpen = false;
+    private bool AutoPromoteQueen = true;
 
     void StartDrag(int fromSquareId)
     {
@@ -92,44 +97,75 @@
         ChessBoard.HighlightMoves(ChessBoard.LegalMoves, false);
         ToSquareId = toSquareId;
         var moveToMake = ChessBoard.LegalMoves.FirstOrDefault(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId);
-        if (moveToMake != null)
+        if(moveToMake == null)
         {
-            var moveMade = ChessBoard.MakeMove(moveToMake);
-            if (moveMade)
+            return;
+        }
+        else
+        {
+            if (moveToMake.Flag == MoveFlag.PawnPromotion)
             {
-                ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn);
+                if (AutoPromoteQueen)
+                {
+                    var pieceToMove = ChessConstants.Pieces[ChessBoard.Squares[moveToMake.FromSquareId].PieceId];
+                    moveToMake.PromotionPieceId = PromotionPieces[Convert.ToInt32(pieceToMove.IsWhite)][3];
+                    MakeMoveOnBoard(moveToMake);
+                }
+                else
+                {
+                    ShowModal();
+                    StateHasChanged();
+                }
+            }
+            else
+            {
+                MakeMoveOnBoard(moveToMake);
             }
         }
     }
 
+    private void MakeMoveOnBoard(Move move)
+    {
+        var moveMade = ChessBoard.MakeMove(move);
+        if (moveMade)
+        {
+            ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.CurrentBoardInfo.IsWhiteTurn);
+        }
+
+    }
+
     void ToggleAutoPromote()
     {
-        ChessBoard.AutoPromoteQueen = !ChessBoard.AutoPromoteQueen;
+        AutoPromoteQueen = !AutoPromoteQueen;
     }
 
     private void ToggleModal()
     {
-        ChessBoard.PromotionModalIsOpen = !ChessBoard.PromotionModalIsOpen;
+        PromotionModalIsOpen = !PromotionModalIsOpen;
         StateHasChanged();
     }
 
     void ShowModal()
     {
-        ChessBoard.PromotionModalIsOpen = true;
+        PromotionModalIsOpen = true;
     }
 
     void UnMakeMove()
     {
-        if(ChessBoard.MovesMade.Count > 0)
+        if(ChessBoard.MoveHistory.Count > 0)
         {
-            ChessBoard.UnMakeMove(ChessBoard.MovesMade.Peek());
-            ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.IsWhiteTurn);
+            ChessBoard.UnMakeMove(ChessBoard.MoveHistory.Peek());
+            ChessBoard.LegalMoves = ChessBoard.GenerateLegalMoves(ChessBoard.CurrentBoardInfo.IsWhiteTurn);
         }
     }
 
     private void SelectPromotionPiece(int id)
     {
-        var promotionPieceIndex = Convert.ToInt32(ChessBoard.IsWhiteTurn);
-        ChessBoard.PromotionModalIsOpen = false;
+        var moveToMake = ChessBoard.LegalMoves.FirstOrDefault(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId);
+
+        var pieceToMove = ChessConstants.Pieces[ChessBoard.Squares[moveToMake.FromSquareId].PieceId];
+        moveToMake.PromotionPieceId = PromotionPieces[Convert.ToInt32(pieceToMove.IsWhite)][id];
+        PromotionModalIsOpen = false;
+        MakeMoveOnBoard(moveToMake);
     }
 }

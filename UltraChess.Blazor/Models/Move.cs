@@ -19,6 +19,6 @@
         public int ToSquareId { get; set; }
         public int CapturedPieceId { get; set; }
         public MoveFlag Flag { get; set; }
-
+        public int PromotionPieceId { get; set; }
     }
 }

@@ -12,13 +12,11 @@ namespace UltraChess.UnitTests.Pieces
         public void GetKingMovesTest()
         {
             // Arrange
-            var sut = new ChessBoard("k6K/8/8/8/8/8/8/8 w KQkq - 0 1")
-            {
-                IsWhiteTurn = false
-            };
+            var sut = new ChessBoard("k6K/8/8/8/8/8/8/8 w KQkq - 0 1");
+            sut.CurrentBoardInfo.IsWhiteTurn = false;
 
             // Act
-            var moves = sut.GetMovesFromSquare(0, sut.IsWhiteTurn);
+            var moves = sut.GetMovesFromSquare(0, sut.CurrentBoardInfo.IsWhiteTurn);
 
             // Assert
             var expectedMoves = new List<Move> { new Move(0, 1), new Move(0, 8), new Move(0, 9)};
