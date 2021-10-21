@@ -1,5 +1,6 @@
 ﻿@page "/chess"
 @using UltraChess.Blazor.Models
+@using UltraChess.Blazor.Constants 
 
 <div class="container">
     <div class="mb-1 row align-items-start">
@@ -60,7 +61,7 @@
                     @{
                         if (square.PieceId != 0)
                         {
-                            <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessBoard.Pieces[square.PieceId].Image)" @ondrag="@(() => StartDrag(square.Id))" ondrop="event.preventDefault();" />
+                            <img id="@($"{square.Rank}.{square.File}-image")" src="@(ChessConstants.Pieces[square.PieceId].Image)" @ondrag="@(() => StartDrag(square.Id))" ondrop="event.preventDefault();" />
                         }
                     }
                 </div>
@@ -106,7 +107,7 @@
             {
                 if (AutoPromoteQueen)
                 {
-                    var pieceToMove = ChessBoard.Pieces[ChessBoard.Squares[moveToMake.FromSquareId].PieceId];
+                    var pieceToMove = ChessConstants.Pieces[ChessBoard.Squares[moveToMake.FromSquareId].PieceId];
                     moveToMake.PromotionPieceId = PromotionPieces[Convert.ToInt32(pieceToMove.IsWhite)][3];
                     MakeMoveOnBoard(moveToMake);
                 }
@@ -162,7 +163,7 @@
     {
         var moveToMake = ChessBoard.LegalMoves.FirstOrDefault(m => m.FromSquareId == FromSquareId && m.ToSquareId == ToSquareId);
 
-        var pieceToMove = ChessBoard.Pieces[ChessBoard.Squares[moveToMake.FromSquareId].PieceId];
+        var pieceToMove = ChessConstants.Pieces[ChessBoard.Squares[moveToMake.FromSquareId].PieceId];
         moveToMake.PromotionPieceId = PromotionPieces[Convert.ToInt32(pieceToMove.IsWhite)][id];
         PromotionModalIsOpen = false;
         MakeMoveOnBoard(moveToMake);
