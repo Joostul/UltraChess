@@ -81,18 +81,5 @@ namespace UltraChess.UnitTests.Board
 
             // Assert
         }
-
-        [TestMethod]
-        public void GetNumberOfLegalMoves()
-        {
-            // Arrange
-            var moveGeneratorTestTool = new MoveGenerator("r3k2r/p1p1qpb1/bn1ppnp1/1B1PN3/1p2P3/2N2Q1p/PPPB1PPP/1R2K2R b Kkq - 1 2");
-
-            // Act
-            var numberOfLegalMoves = moveGeneratorTestTool.GenerateMoves(1, true);
-
-            // Assert
-            numberOfLegalMoves.ShouldBe(7);
-        }
     }
 }

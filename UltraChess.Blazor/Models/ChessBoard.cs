@@ -212,7 +212,6 @@ namespace UltraChess.Blazor.Models
                 }
 
                 CurrentBoardInfo.IsWhiteTurn = !CurrentBoardInfo.IsWhiteTurn;
-                AttackedSquares = GenerateMoves(CurrentBoardInfo.IsWhiteTurn, true).Select(m => m.ToSquareId).ToArray();
                 return true;
             }
         }
@@ -273,7 +272,6 @@ namespace UltraChess.Blazor.Models
             }
             // Set back to correct turn
             CurrentBoardInfo = previousBoardInfo;
-            AttackedSquares = GenerateMoves(!CurrentBoardInfo.IsWhiteTurn, true).Select(m => m.ToSquareId).ToArray();
 
             MoveHistory.Pop();
             BoardInfoHistory.Pop();
@@ -363,6 +361,7 @@ namespace UltraChess.Blazor.Models
             foreach (var move in pseudoLegalMoves)
             {
                 MakeMove(move);
+                AttackedSquares = GenerateMoves(CurrentBoardInfo.IsWhiteTurn, true).Select(m => m.ToSquareId).ToArray();
                 var yourKingSquareId = Squares.Single(s => s.PieceId == yourPieceKingId).Id;
 
                 if (move.Flag == MoveFlag.Castling)
